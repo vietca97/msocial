@@ -35,7 +35,12 @@ public class RedisUtils {
     @SuppressWarnings("unused")
     private static int socketTimeout = 10000, soapTimeout = 100000;
 
-    public  String getValueService(String serviceName){
+    public RedisUtils(){
+        if(jedisPool == null ){
+            init();
+        }
+    }
+    public  String get(String serviceName){
         if(jedisPool == null ){
             init();
         }
@@ -43,9 +48,28 @@ public class RedisUtils {
         return jedis.get(serviceName);
     }
 
+    public void put(String key, String value){
+        if(jedisPool == null ){
+            init();
+        }
+        Jedis jedis = jedisPool.getResource();
+        jedis.append(key,value);
+    }
+
+    public void set(String key, String value){
+        if(jedisPool == null ){
+            init();
+        }
+        Jedis jedis = jedisPool.getResource();
+        jedis.set(key,value);
+    }
+
     public  void init(){
+        redisServer = "10.252.12.237;";
+        redisPort = "16379;";
         String[] host = redisServer.split(";");
         String[] port = redisPort.split(";");
+
         for (int i = 0; i < host.length; i++) {
             sentinels.add(host[i] + ":" + Integer.parseInt(port[i]));
         }

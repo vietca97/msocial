@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "01c11315-bc31-4f68-b43f-c374fad07092",
+		"name": "msocial-flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "step_16",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"vietlv\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=trans_refused_per_service&Provider=default&ParamSize=2&P1&P2&response=application/json",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "trans_refused_per_service"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "2"
+						},
+						{
+							"key": "P1",
+							"value": null
+						},
+						{
+							"key": "P2",
+							"value": null
+						},
+						{
+							"key": "response",
+							"value": "application/json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=system_parameter&Provider=default&ParamSize=0&response=application/json",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "system_parameter"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "0"
+						},
+						{
+							"key": "response",
+							"value": "application/json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_3",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=sql_check_password_partner&Provider=default&ParamSize=2&P1=htkt@neo.vn&P2=123456Abc&reponse=application/json",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "sql_check_password_partner"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "2"
+						},
+						{
+							"key": "P1",
+							"value": "htkt@neo.vn"
+						},
+						{
+							"key": "P2",
+							"value": "123456Abc"
+						},
+						{
+							"key": "reponse",
+							"value": "application/json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_8",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=spamcheck&Provider=default&ParamSize=1&P1=3178",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "spamcheck"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "1"
+						},
+						{
+							"key": "P1",
+							"value": "3178"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_9",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=get_mt&Provider=default&ParamSize=0&reponse=application/json",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "get_mt"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "0"
+						},
+						{
+							"key": "reponse",
+							"value": "application/json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_10",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=get_service_service_package&Provider=default&ParamSize=1&reponse=application/json&P1=3178",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "get_service_service_package"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "1"
+						},
+						{
+							"key": "reponse",
+							"value": "application/json"
+						},
+						{
+							"key": "P1",
+							"value": "3178"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_11",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=get_partner_type&Provider=default&ParamSize=1&response=application/json&P1=261",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "get_partner_type"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "1"
+						},
+						{
+							"key": "response",
+							"value": "application/json"
+						},
+						{
+							"key": "P1",
+							"value": "261"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step_13",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://10.252.12.237:4122/services/SqlServices/query?Service=script_shop_information&Provider=default&ParamSize=2&response=application/json&P1=2917&P2=SMS",
+					"protocol": "http",
+					"host": [
+						"10",
+						"252",
+						"12",
+						"237"
+					],
+					"port": "4122",
+					"path": [
+						"services",
+						"SqlServices",
+						"query"
+					],
+					"query": [
+						{
+							"key": "Service",
+							"value": "script_shop_information"
+						},
+						{
+							"key": "Provider",
+							"value": "default"
+						},
+						{
+							"key": "ParamSize",
+							"value": "2"
+						},
+						{
+							"key": "response",
+							"value": "application/json"
+						},
+						{
+							"key": "P1",
+							"value": "2917"
+						},
+						{
+							"key": "P2",
+							"value": "SMS"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

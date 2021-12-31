@@ -1,0 +1,697 @@
+import java.text.*;
+import java.util.*;
+def logSql = {String msisdn, String transactionId, String stepName, String stepIndex,String stepKey,String stepInput,String stepOutput,String stepAction,String startTime, String endTime,String inputParameter,String scriptShopId ->
+	String request = """
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+				   <soapenv:Header/>
+				   <soapenv:Body>
+				      <vms:updateXml>
+				         <!--Optional:-->
+				         <vms:Service>sql_log_transaction_step</vms:Service>
+				         <!--Optional:-->
+				         <vms:Provider>default</vms:Provider>
+				         <!--Optional:-->
+				        <vms:ParamSize>12</vms:ParamSize>
+				         <!--Optional:-->
+				         <vms:P1>$transactionId</vms:P1>
+				         <!--Optional:-->
+				         <vms:P2>$stepName</vms:P2>
+				         <!--Optional:-->
+				         <vms:P3>$stepIndex</vms:P3>
+				         <!--Optional:-->
+				         <vms:P4>$stepKey</vms:P4>
+				         <!--Optional:-->
+				         <vms:P5>$stepInput</vms:P5>
+				         <!--Optional:-->
+				         <vms:P6>$stepOutput</vms:P6>
+				         <!--Optional:-->
+				         <vms:P7>$stepAction</vms:P7>
+				         <!--Optional:-->
+				         <vms:P8>$startTime</vms:P8>
+				         <!--Optional:-->
+				         <vms:P9>$endTime</vms:P9>
+				         <!--Optional:-->
+				         <vms:P10>$msisdn</vms:P10>
+				         <!--Optional:-->
+				         <vms:P11>$inputParameter</vms:P11>      
+				         <vms:P12>$scriptShopId</vms:P12>   
+				      </vms:updateXml>
+				   </soapenv:Body>
+				</soapenv:Envelope>
+				""";
+	String result = new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request);
+	
+}
+def sendSms = {String receiver, String contentmsg ->
+	try{
+		receiver = String.valueOf(receiver);
+		String serviceNumber = context.get("SERVICE_NUMBER");
+		String smsHost = context.get("SMS_HOST");
+		String smsPort = context.get("SMS_PORT");
+		String smsLookup = context.get("SMS_LOOKUP");
+		String utilUrl = context.get("dataflow_param:utilmodule");
+		String request = """
+		<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+		   <soapenv:Header/>
+		   <soapenv:Body>
+		      <vms:sendSms>
+		         <!--Optional:-->
+		         <vms:args0>$serviceNumber</vms:args0>
+		         <!--Optional:-->
+		         <vms:args1>$receiver</vms:args1>
+		         <!--Optional:-->
+		         <vms:args2>$contentmsg</vms:args2>
+		         <!--Optional:-->
+		         <vms:args3>$smsHost</vms:args3>
+		         <!--Optional:-->
+		         <vms:args4>$smsPort</vms:args4>
+		         <!--Optional:-->
+		         <vms:args5>$smsLookup</vms:args5>
+		      </vms:sendSms>
+		   </soapenv:Body>
+		</soapenv:Envelope>
+		"""
+		
+		String result = new neo.service.Activation().soapCall(utilUrl,request);
+		return result;
+	}catch(Exception e){
+		return "-1|"+e.getMessage();
+	}
+}
+def getValueFromKey = {String body, String key ->
+	String ret = "";
+	try{
+		def rootNode = new XmlSlurper().parseText(body);
+		for(def record : rootNode.record.children()){
+			if(record.name().equals(key)){
+				ret = record.text();
+				break;
+			}
+		}		
+	}catch(Exception ex){
+		ex.printStackTrace();
+		ret = "";
+	}
+	return ret;
+}
+def getValueFromKeyMultiRecords = {String body, String rootTag,String tagName,String key,String value ->
+	String ret = new neo.service.ParseXml().getValueFromKey(body,rootTag,tagName,key,value);
+	
+	return ret;
+}
+def checkMIBigger = {String info,String serviceId,String packageCode ->
+	String[] retval = new String[7];
+	if(info == null || info.indexOf("DATA_WEB_SUCC")<0){
+		if(info!=null){
+			if(info.equals("KT_DATA_WEB_ERR01: NULL")){
+				retval[0]="0";
+				return retval;
+			}
+			else{
+				retval[0]="-1";
+				return retval;
+			}
+		}
+		else{
+			retval[0]="0";
+			return retval;
+		}
+	}
+	String pckNeedCheck = info.split("\\|")[0];
+	pckNeedCheck = pckNeedCheck.substring(info.indexOf(" ")).trim();	
+	if(pckNeedCheck.equals(packageCode)){
+		retval[0]="1";
+		return retval;	
+	}
+	String request = """
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+	   <soapenv:Header/>
+	   <soapenv:Body>
+	      <vms:queryXml>
+	  		 <!--Optional:-->
+	         <vms:Service>get_service_package_detail</vms:Service>
+	         <!--Optional:-->
+	         <vms:Provider>default</vms:Provider>
+	         <!--Optional:-->
+	         <vms:ParamSize>3</vms:ParamSize>		
+	         <vms:P1>$packageCode</vms:P1>
+ 		    <vms:P2>$pckNeedCheck</vms:P2>	 
+ 		    <vms:P3>$serviceId</vms:P3>	          		    
+	      </vms:queryXml>
+	   </soapenv:Body>
+	</soapenv:Envelope>	
+	""";
+	String pckInfo = "";
+	double usedPckPrice = -1;
+	double registerPckPrice = -1;
+	String capacity = "";
+	String cycle = "";
+	try{
+		pckInfo = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request),"//*[local-name() = 'return']");	
+		
+		usedPckPrice = Double.parseDouble( getValueFromKeyMultiRecords(pckInfo,"record","PACKAGE_CODE",pckNeedCheck,"PACKAGE_PRICE"));		
+		registerPckPrice = Double.parseDouble(getValueFromKeyMultiRecords(pckInfo,"record","PACKAGE_CODE",packageCode,"PACKAGE_PRICE"));		
+		capacity = getValueFromKeyMultiRecords(pckInfo,"record","PACKAGE_CODE",packageCode,"CAPACITY");		
+		cycle = getValueFromKeyMultiRecords(pckInfo,"record","PACKAGE_CODE",packageCode,"PACKAGE_CYCLE");		
+		if(usedPckPrice.equals("M120") && (packageCode.equals("M120")||packageCode.equals("KM120"))){
+			retval[0] = "10"; retval[1] = pckNeedCheck; retval[2] = usedPckPrice;retval[3]=pckNeedCheck;retval[4]=usedPckPrice;retval[5]=capacity;retval[6]=cycle;
+			return retval;
+		}
+		if(registerPckPrice == usedPckPrice){
+			retval[0] = "10"; retval[1] = pckNeedCheck; retval[2] = usedPckPrice;retval[3]=pckNeedCheck;retval[4]=usedPckPrice;retval[5]=capacity;retval[6]=cycle;
+			return retval;
+		}
+		//gia goi dang ky > gia goi thue bao dang su dung
+		if(registerPckPrice < usedPckPrice){
+			retval[0] = "2";retval[1]=packageCode;retval[2]=registerPckPrice;retval[3]=pckNeedCheck;retval[4]=usedPckPrice;retval[5]=capacity;retval[6]=cycle;
+		}
+		else if(registerPckPrice > usedPckPrice){
+			retval[0] = "3";retval[1]=packageCode;retval[2]=registerPckPrice;retval[3]=pckNeedCheck;retval[4]=usedPckPrice;retval[5]=capacity;retval[6]=cycle;
+		}
+		else{
+			retval[0] = "1";
+		}
+		return retval;
+	}catch(Exception ex){	
+		ex.printStackTrace();
+		retval[0] = "-1"; return retval;
+	}
+}
+def createTransaction = {String script_shop_id,String sharing_key_id, String messageSend,String messageReceive,
+	String msisdn, String transactionStatus,String transactionResponse, String channelIDGT,String channelIDCF,
+	String content, String  packageCodeId, String price, String charging, String chargingType, String chargingStatus,
+	String avenueOne,String avenueMonth,String avenueAgentOne,String avenueAgentMonth, String agent_name_id ->
+	String ret = "";
+	String request = """
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+	   <soapenv:Header/>
+	   <soapenv:Body>
+	      <vms:updateXml>
+	  		 <!--Optional:-->
+	         <vms:Service>generate_transaction</vms:Service>
+	         <!--Optional:-->
+	         <vms:Provider>default</vms:Provider>
+	         <!--Optional:-->
+	         <vms:ParamSize>20</vms:ParamSize>		
+	         <vms:P1>$script_shop_id</vms:P1>
+ 		    <vms:P2>$sharing_key_id</vms:P2>	 
+ 		    <vms:P3>$messageSend</vms:P3>	          		    
+ 		    <vms:P4>$messageReceive</vms:P4>	          		    
+ 		    <vms:P5>$msisdn</vms:P5>	          		    
+ 		    <vms:P6>$transactionStatus</vms:P6>	          		    
+ 		    <vms:P7>$transactionResponse</vms:P7>	          		    
+ 		    <vms:P8>$channelIDGT</vms:P8>	          		    
+ 		    <vms:P9>$channelIDCF</vms:P9>	          		    
+ 		    <vms:P10>$content</vms:P10>	
+		    <vms:P11>$packageCodeId</vms:P11>
+ 		    <vms:P12>$price</vms:P12>	 
+ 		    <vms:P13>$charging</vms:P13>	          		    
+ 		    <vms:P14>$chargingType</vms:P14>	          		    
+ 		    <vms:P15>$chargingStatus</vms:P15>	          		    
+ 		    <vms:P16>$avenueOne</vms:P16>	          		    
+ 		    <vms:P17>$avenueMonth</vms:P17>	          		    
+ 		    <vms:P18>$avenueAgentOne</vms:P18>	          		    
+ 		    <vms:P19>$avenueAgentMonth</vms:P19>	          		    
+ 		    <vms:P20>$agent_name_id</vms:P20> 		              		     		     		     		    
+	      </vms:updateXml>
+	   </soapenv:Body>
+	</soapenv:Envelope>	
+	""";	
+	try{
+		ret = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request),"//*[local-name() = 'return']");	
+		
+		request = """
+			<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+			   <soapenv:Header/>
+			   <soapenv:Body>
+			      <vms:queryXml>			  		 
+			         <vms:Service>get_transaction_id</vms:Service>			         
+			         <vms:Provider>default</vms:Provider>			         
+			         <vms:ParamSize>0</vms:ParamSize>					                  		    		 		    	              		     		     		     		    
+			      </vms:queryXml>
+			   </soapenv:Body>
+			</soapenv:Envelope>	
+			""";	
+		ret = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request),"//*[local-name() = 'return']");			
+		ret = getValueFromKey(ret,"TRANSACTION_ID");	 	
+	}catch(Exception ex){	
+		ret = "-1";
+	}
+	 return ret;
+}
+def createTempTrans = {String transactionId, String sharingKey, String msisdn ->
+	String ret = "";
+	String request = """
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+	   <soapenv:Header/>
+	   <soapenv:Body>
+	      <vms:queryXml>
+	  		 <!--Optional:-->
+	         <vms:Service>select_temp_accept_id</vms:Service>
+	         <!--Optional:-->
+	         <vms:Provider>default</vms:Provider>
+	         <!--Optional:-->
+	         <vms:ParamSize>1</vms:ParamSize>		
+	         <vms:P1>$msisdn</vms:P1>          		     			              		     		     		     		    
+	      </vms:queryXml>
+	   </soapenv:Body>
+	</soapenv:Envelope>	
+	""";		
+	try{
+		ret = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request),"//*[local-name() = 'return']");			
+		int tempAcceptId = getValueFromKey(ret,"ACCEPT_ID");
+		if(tempAcceptId ==0) tempAcceptId =1;
+		request = """
+		<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+		   <soapenv:Header/>
+		   <soapenv:Body>
+		      <vms:updateXml>
+		  		 <!--Optional:-->
+		         <vms:Service>insert_temp_accept_id</vms:Service>
+		         <!--Optional:-->
+		         <vms:Provider>default</vms:Provider>
+		         <!--Optional:-->
+		         <vms:ParamSize>4</vms:ParamSize>		
+		         <vms:P1>$transactionId</vms:P1>          		     			              		     		     		     		    
+		         <vms:P2>$sharingKey</vms:P2>    
+		         <vms:P3>$msisdn</vms:P3>    
+		         <vms:P4>$tempAcceptId</vms:P4>    
+		      </vms:updateXml>
+		   </soapenv:Body>
+		</soapenv:Envelope>	
+		""";		
+		try{
+			ret = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:sqlmodule"),request),"//*[local-name() = 'return']");				
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+	}catch(Exception ex){
+		ex.printStackTrace();
+		return "-1";
+	}
+	return ret;
+}
+//do bussiness
+/*
+soap_8: mt_info
+soap_24: system_info
+soap_9:service_package_info
+soap_12:partner_info
+*/
+System.out.println("PACKAGE_CYCLE:"+context.get("PACKAGE_CYCLE")+"|"+msisdn+"|"+context.get("SERVICE_KEY"));
+
+//check thue bao huy
+boolean check = false;
+String startTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+boolean stepResult = false;
+context.put("ErrorCodeAPI","0");context.put("ErrorDescAPI","init");
+if(!context.get("SERVICE_KEY").equals("MOBILEINTERNET") && !context.get("SERVICE_KEY").equals("FASTCONNECT") ){	
+	return true;
+}
+System.out.println("PACKAGE_CYCLE:"+context.get("PACKAGE_CYCLE")+"|"+msisdn);
+
+String mi_status_info = context.get("checkservice_cmdresponse_with_value");
+System.out.println("PACKAGE_CYCLE:"+context.get("PACKAGE_CYCLE")+"|"+msisdn);
+
+String mi_huy_info = context.get("checkhuy_cmdresponse_with_value");
+System.out.println("PACKAGE_CYCLE:"+context.get("PACKAGE_CYCLE")+"|"+msisdn);
+
+String packageCode = context.get("PACKAGE_CODE");
+String serviceId = context.get("serviceid");
+int pckCycle = -1;
+try{
+	boolean iscontinue = false;
+
+	//Đối với các gói không cần check giá cước, sử dụng dịch vụ thì cho đăng ký luôn DP100,200,300,MAX10,30
+	if(context.get("HAVE_CHECK_HUY").equals("0")) {
+	System.out.println($msisdn+"||||"+iscontinue+"|||"+context.get("PACKAGE_CODE")+"|||"+context.get("HAVE_CHECK_HUY"));
+	return true;
+	}
+	pckCycle = Integer.parseInt(context.get("PACKAGE_CYCLE"));	
+	System.out.println($msisdn+"||||"+iscontinue+"|||"+packageCode+"|||"+context.get("HAVE_CHECK_HUY"));
+	if(pckCycle == -1) return false;
+	//check MI, FC chu ky 30 ngay
+	if(pckCycle == 30){
+		if(!packageCode.startsWith("KM") && !packageCode.startsWith("MAX")){
+			if(mi_status_info == "" || mi_status_info.indexOf("DATA_WEB_SUCC")<0){
+				
+			}
+			else{
+				String pckInUse = mi_status_info.split("\\|")[0];
+				pckInUse = pckInUse.substring(pckInUse.lastIndexOf(" ")).trim();
+	
+				if(pckInUse.equals("MIU")||pckInUse.equals("MIU3")||pckInUse.equals("MIU25")){
+					if(packageCode.equals("M70")) iscontinue = false;
+					else {
+						if(context.get("HAVE_CHECK_HUY_WITH_5000").equals("0"))
+							iscontinue = false;
+						else
+							iscontinue = true;
+					}
+				}
+				else {
+					if(context.get("HAVE_CHECK_HUY_WITH_5000").equals("0")){
+						if(packageCode.equals("DP100")||packageCode.equals("DP200")||packageCode.equals("DP300")||packageCode.equals("2T79")){
+							iscontinue = true;
+						}
+							iscontinue = false;
+					}
+					else
+						iscontinue = true;
+				}
+				System.out.println($msisdn+"||||"+iscontinue+"|||"+packageCode+"|||"+context.get("HAVE_CHECK_HUY"));
+				if (!iscontinue){								
+					context.put("ErrorCodeAPI","250"); context.put("ErrorDescAPI",getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","SUBSCRIBER_HAVE_OTHER_PACKAGE_CODE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{PACKAGE_CODE}",context.get("PACKAGE_CODE_SMS")).replaceAll("\\{PACKAGE_CODE_IN_USE}",pckInUse));
+					if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+						//return tid+":INFO:Thong bao: Ban KHONG THE dang ky goi dich vu "+packCode+" cho thue bao "+receiver+", do hien tai thue bao dang co goi "+pckInUse+". Chi tiet lien he 9090.";
+						String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","SUBSCRIBER_HAVE_OTHER_PACKAGE_CODE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{PACKAGE_CODE}",context.get("PACKAGE_CODE_SMS")).replaceAll("\\{PACKAGE_CODE_IN_USE}",pckInUse);
+						if(mt == null || mt.equals(""))
+							mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","SUBSCRIBER_HAVE_OTHER_PACKAGE_CODE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{PACKAGE_CODE}",context.get("PACKAGE_CODE_SMS")).replaceAll("\\{PACKAGE_CODE_IN_USE}",pckInUse);
+						ret = sendSms(context.get("sharingkey"),mt);						
+					}
+					return false;	
+				}
+				//neu iscontinue = true thi chay tiep phia duoi de check gia goi cao hay thap
+			}
+			//goi ham lay thong tin huy
+			String vasgateHost = context.get("VASGATE_SERVER_IP");
+			String vasgatePort = context.get("VASGATE_SERVER_PORT");
+			String request = """
+			<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+			   <soapenv:Header/>
+			   <soapenv:Body>
+			      <vms:sendCommand>
+				 <vms:cmd>VASPRO.SERVICEACTION -subscriber=$msisdn -arg0=999 -arg1=GET_REGISTED_DATA -arg2= -arg3=VAS -arg4=vms_vas -arg5=vms_vas</vms:cmd>
+				 <vms:channel>MSOCIAL_$channel</vms:channel>
+				 <vms:vasgatehost>$vasgateHost</vms:vasgatehost>		         
+				 <vms:vasgateport>$vasgatePort</vms:vasgateport>
+			      </vms:sendCommand>
+			   </soapenv:Body>
+			</soapenv:Envelope>
+			""";		
+			String huy_info_2 = "";
+			try{				
+				huy_info_2 = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:utilmodule"),request),"//*[local-name() = 'return']");	
+				context.put("SUBSCRIBER_HUY_INFO_2_REQUEST",request);	
+				context.put("SUBSCRIBER_HUY_INFO_2_RESPONSE",huy_info_2);		
+				logSql(msisdn,"-1","CHECK_HUY_MIFC_REQUEST","5","CHECK_HUY_MIFC_REQUEST","VASPRO.SERVICEACTION -subscriber=$msisdn -arg0=999 -arg1=GET_REGISTED_DATA -arg2= -arg3=VAS -arg4=vms_vas -arg5=vms_vas",huy_info_2,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+			}catch(Exception ex){
+				System.out.println(ex.getMessage());
+				context.put("ErrorCodeAPI","-1"); context.put("ErrorDescAPI","Loi khi tra cuu Profile thue bao FC");
+				logSql(msisdn,"-1","CHECK_HUY_MIFC_REQUEST","5","CHECK_HUY_MIFC_REQUEST","VASPRO.SERVICEACTION -subscriber=$msisdn -arg0=999 -arg1=GET_REGISTED_DATA -arg2= -arg3=VAS -arg4=vms_vas -arg5=vms_vas",ex.getMessage(),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+				return false;
+			} 
+			if(huy_info_2 == null || huy_info_2.equals("GET_REGISTED_DATA_ERR")){
+				context.put("ErrorCodeAPI","26"); context.put("ErrorDescAPI","Loi tra cuu lich su huy dich vu");
+				return false;
+			}
+			if(huy_info_2.startsWith("GET_REGISTED_DATA_EXIST")){
+				//getTime
+				if(context.get("HAVE_CHECK_HUY").equals("1") ){
+					try{
+						String[] p = huy_info_2.split("\\|");
+						if(p.length!=4 &&p.length!=5 ){
+							if (p.length!=3){
+								context.put("ErrorCodeAPI","26"); context.put("ErrorDescAPI","Loi tra cuu lich su huy dich vu "+mi_huy_info+",p_length:"+p.length);
+								return false;	
+							}
+						}						
+						else {
+							String pckHuy = p[0].substring(p[0].lastIndexOf(":")+1).trim();
+							String time = p[3];
+							java.util.Date timeHuy = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(time);
+							Calendar c = Calendar.getInstance();
+							c.setTime(timeHuy);
+							c.add(Calendar.DATE, 30);
+							Calendar now = Calendar.getInstance();
+							if(c.getTime().after(now.getTime())){
+								if (context.get("HAVE_CHECK_HUY_WITH_5000").equals("0")){
+									iscontinue = false;
+								}
+								else
+									iscontinue = false;
+								
+								if(!iscontinue ){
+									//huy trong vong 30 ngay
+									//return tid+":INFO:Thong bao: Ban KHONG THE dang ky goi dich vu "+packCode+" cho thue bao "+receiver+". Do thue bao da co giao dich HUY/bi HUY goi "+pckHuy+" trong vong 30 ngay truoc do. Chi tiet lien he 9090.";
+									if(context.get("SEND_SMS").equals("1")  && context.get("channel").equals("SMS")){								
+										String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","SUBSCRIBER_CAN_NOT_HUY_30NGAY","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{PACKAGE_CODE}",context.get("PACKAGE_CODE_SMS")).replaceAll("\\{PACKAGE_CODE_HUY}",pckHuy);
+										if(mt == null || mt.equals(""))
+											mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","SUBSCRIBER_CAN_NOT_HUY_30NGAY","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{PACKAGE_CODE}",context.get("PACKAGE_CODE_SMS")).replaceAll("\\{PACKAGE_CODE_HUY}",pckHuy);
+										ret = sendSms(context.get("sharingkey"),mt);
+									}
+									context.put("ErrorCodeAPI","259"); context.put("ErrorDescAPI","Thue bao MI/FC co lich su huy goi trong 30 ngay");
+									return false;
+								}
+							}
+							
+						}
+
+					}catch(Exception ex){
+						ex.printStackTrace();
+						context.put("ErrorCodeAPI","26"); context.put("ErrorDescAPI","Loi tra cuu lich su huy dich vu");
+						return false;
+					}
+				}
+			}
+		}
+	}	
+	//check profile fastconnect
+	if(context.get("SERVICE_KEY").equals("FASTCONNECT")){
+		//check Profile thue bao
+		String vasgateHost = context.get("VASGATE_SERVER_IP");
+		String vasgatePort = context.get("VASGATE_SERVER_PORT");
+		System.out.println("vasgatePort:"+vasgatePort);
+		String msisdnTmp = $msisdn; if(msisdn.startsWith("84")) msisdnTmp = msisdn.substring(2);
+		String request = """
+		<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+		   <soapenv:Header/>
+		   <soapenv:Body>
+		      <vms:sendCommand>
+		         <vms:cmd>VIEW.PROFILE -subscriber=$msisdnTmp</vms:cmd>
+		         <vms:channel>MSOCIAL_$channel</vms:channel>
+		         <vms:vasgatehost>$vasgateHost</vms:vasgatehost>		         
+		         <vms:vasgateport>$vasgatePort</vms:vasgateport>
+		      </vms:sendCommand>
+		   </soapenv:Body>
+		</soapenv:Envelope>
+		""";		
+		String profile = "";
+		try{			
+			profile = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:utilmodule"),request),"//*[local-name() = 'return']");	
+			context.put("SUBSCRIBER_PROFILE_REQUEST",request);	
+			context.put("SUBSCRIBER_PROFILE_RESPONSE",profile);		
+			logSql(msisdn,"-1","CHECK_PROFILE_FC_REQUEST","5","CHECK_PROFILE_FC_REQUEST","VIEW.PROFILE -subscriber="+msisdnTmp,profile,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+		}catch(Exception ex){
+			System.out.println(ex.getMessage());
+			context.put("ErrorCodeAPI","-1"); context.put("ErrorDescAPI","Loi khi tra cuu Profile thue bao FC");
+			logSql(msisdn,"-1","CHECK_PROFILE_FC_REQUEST","5","CHECK_PROFILE_FC_REQUEST","VIEW.PROFILE -subscriber="+msisdnTmp,ex.getMessage(),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+			return false;
+		}			
+		boolean isTT = false;
+		boolean foundFC = false;
+		String[] fcProfile = context.get("dataflow_param:FC_PROFILE").split(",");//  ["FCZ:0","FCT2:0","TTN:0","FCPV:0","TSFC:1","CFC:0","TSFB:1","FCDN:0"];		
+		for(int i=0; i <fcProfile.length;i++){
+			String[] p = fcProfile[i].split(":");
+			if(p[0].equals(profile)) {
+				foundFC = true;
+				if(p[1].equals("0")) isTT = true; 
+				else isTT = false;
+				break;
+			}
+		}
+		if(!foundFC){
+			//return tid+":INFO:Thong bao: Ban KHONG THE dang ky dich vu "+obj.getServiceKey()+" cho thue bao "+receiver+". Do thue bao khong phai la thue bao FASTCONNECT. Chi tiet lien he 9090.";
+			if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+				String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","THUE_BAO_NOT_FASTCONNECT","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+				if(mt == null || mt.equals(""))
+					mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","THUE_BAO_NOT_FASTCONNECT","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+				System.out.println($msisdn+"||||"+mt);
+				ret = sendSms(context.get("sharingkey"),mt);
+				System.out.println("ret:"+ret);												
+			}
+			context.put("ErrorCodeAPI","27"); context.put("ErrorDescAPI","Thue bao khong phai Fastconnect");
+			return false;			
+		}
+		if(isTT){
+			System.out.println("continue ...");
+		}
+		else{
+			boolean activeMoreThan365Days = false;
+			request = """
+			<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+			   <soapenv:Header/>
+			   <soapenv:Body>
+			      <vms:sendCommand>
+			         <!--Optional:-->
+			         <vms:cmd>VIEW.ACTIVEDATE -subscriber="+$msisdn.substring(2)</vms:cmd>
+			         <!--Optional:-->
+			         <vms:channel>MSOCIAL_$channel</vms:channel>
+			         <!--Optional:-->
+			         <vms:vasgatehost>$vasgateHost</vms:vasgatehost>
+			         <!--Optional:-->
+			         <vms:vasgateport>$vasgatePort</vms:vasgateport>
+			      </vms:sendCommand>
+			   </soapenv:Body>
+			</soapenv:Envelope>
+			""";		
+			String startDate = "";
+			try{
+				startDate = new neo.service.Activation().parseXMLtext(new neo.service.Activation().soapCall(context.get("dataflow_param:utilmodule"),request),"//*[local-name() = 'return']");					
+				context.put("SUBSCRIBER_ACTIVE_DATE_REQUEST",request);	
+				context.put("SUBSCRIBER_ACTIVE_DATE_RESPONSE",startDate);
+				logSql(msisdn,"-1","CHECK_STARTDATE_FC_REQUEST","6","CHECK_STARTDATE_FC_REQUEST","VIEW.ACTIVEDATE -subscriber="+$msisdn.substring(2),startDate,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+			}catch(Exception ex){
+				System.out.println(ex.getMessage());
+				context.put("ErrorCodeAPI","-1"); context.put("ErrorDescAPI","Loi khi tra cuu ngay kich hoat FC");
+				logSql(msisdn,"-1","CHECK_STARTDATE_FC_REQUEST","6","CHECK_STARTDATE_FC_REQUEST","VIEW.ACTIVEDATE -subscriber="+$msisdn.substring(2),ex.getMessage(),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
+				return false;
+			}				
+			System.out.println("dateActive:"+startDate+",msisdn:"+msisdn);
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			if(startDate == null || startDate.equals(""))
+					activeMoreThan365Days = false;
+			else{
+				try{
+					Date cDate = sdf.parse(startDate);
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(cDate);						
+					cal.add(Calendar.DATE, 365);
+					Calendar now = Calendar.getInstance();
+					System.out.println("------------------DTAC_DATE:"+checkStartDate);
+					System.out.println("------------------DTAC_DATE+365:"+ sdf.format(cal.getTime()));
+					System.out.println("------------------NOW_DATE:"+ sdf.format(now.getTime()));
+					if(cal.getTime().after(now.getTime()) || sdf.format(cal.getTime()).equals(sdf.format(now.getTime()))){
+						activeMoreThan365Days = false ;							
+					}
+					else
+						activeMoreThan365Days = true;
+				}catch(Exception ex){
+					System.out.println(ex.getMessage());
+					activeMoreThan365Days = true;
+				}
+				
+			}	
+			if(!activeMoreThan365Days){
+				//return tid+":INFO:Thong bao: Ban KHONG THE dang ky dich vu "+obj.getServiceKey()+" cho thue bao "+receiver+". Do day la thue bao Fast Connect tra sau co thoi gian kich hoat trong vong 12 thang truoc do. Chi tiet lien he 9090";
+				if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+					String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","THUE_BAO_FASTCONNECT_TS","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+					if(mt == null || mt.equals(""))
+						mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","THUE_BAO_FASTCONNECT_TS","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+					ret = sendSms(context.get("sharingkey"),mt);
+					System.out.println("ret:"+ret);												
+				}
+				context.put("ErrorCodeAPI","28"); context.put("ErrorDescAPI","Thue bao Fastconnect co thoi gian kich hoat trong 12 thang");				
+				logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);	
+				return false;				
+			}
+			else{
+				System.out.println("FC TS continue...");
+			}
+		}
+	}			
+	System.out.println("AAAAAAAAAAAAAAAAAAA-------------BBBBBBBBBBBBBBBBBBBb "+msisdn+" - "+String.valueOf(iscontinue));
+	//Thiet lap tham so iscontinue (de thiet lap hoa hong 5000 cho cac giao dich MI/FC thue bao co log huy trong 30 ngay va dang ky goi cuoc 30 ngay
+	context.put("BILLING_ISCONTINUE",String.valueOf(iscontinue));
+	if(packageCode.equals("KM1") || packageCode.equals("KM2")||packageCode.equals("KM3")||packageCode.equals("KM4")|| packageCode.equals("KM6")||packageCode.equals("KM7") || packageCode.equals("KM8") ){
+		boolean checkkm = true;//checkKM(receiver);
+		if(checkkm){
+			try{
+				String p = mi_status_info.split("\\|")[0];
+				p = p.substring(p.lastIndexOf(" ")).trim();	
+				if(p!=null && !p.equals("")&& !p.equals("NULL")){
+					//sendSms(this.sender, receiver, "Ban dang su dung goi Mobile Internet "+p+". Ban can phai huy goi truoc khi dang ky CTKM. Chi tiet lien he 9090. Xin cam on");
+					//return tid+":INFO:Khach hang "+receiver+" dang su dung goi Mobile Internet "+p+". Khach hang can phai huy goi truoc khi dang ky CTKM. Chi tiet lien he 9090. Xin cam on";
+					if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+						String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","MI_CTKM_NOTICE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE_IN_USE}",context.get("PACKAGE_CODE_IN_USE")).replaceAll("\\{SERVICE_NAME}",p);
+						if(mt == null || mt.equals(""))
+							mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","MI_CTKM_NOTICE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE_IN_USE}",context.get("PACKAGE_CODE_IN_USE")).replaceAll("\\{SERVICE_NAME}",p);
+						ret = sendSms(context.get("sharingkey"),mt);
+						System.out.println("ret:"+ret);												
+					}
+					context.put("ErrorCodeAPI","29"); context.put("ErrorDescAPI","Thue bao can huy goi truoc khi dang ky CTKM");	
+					logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);				
+					return false;					
+				}
+				else{
+					//process below
+				}
+			}catch(Exception ex){
+				return tid+":INFO:He thong dang ban xin moi thu lai sau.";
+			}
+		}
+		else{
+			//return tid+":INFO:Thue bao "+receiver+" khong nam trong danh sach duoc khuyen mai. Chi tiet lien he 9090. Xin cam on";
+		}	
+	}					
+	else{	
+		String[] info = checkMIBigger(mi_status_info, serviceId, packageCode);
+		String[] miinfo = null;
+		if(info[0].equals("2")||info[0].equals("3"))
+			miinfo = info;		
+		System.out.println("miinfo:"+miinfo);
+		System.out.println("info:"+info[0]);
+		if(info[0].equals("2")){
+			
+			if(packageCode.equals("MAX10") || packageCode.equals("MAX30")){
+				
+			}
+			else{				
+				//retval[0] = "2";retval[1]=packageCode;retval[2]=registerPckPrice;retval[3]=pckNeedCheck;retval[4]=usedPckPrice;retval[5]=capacity;retval[6]=cycle;
+				//return tid+":INFO:Thong bao: Khach hang "+receiver+" dang su dung goi cuoc FC "+info[1]+" gia cuoc "+info[2]+"dong. Ban KHONG THE gioi thieu dang ky voi goi cuoc thap hon, hay gioi thieu goi cuoc CAO HON hoac goi 9090 de duoc ho tro.";
+				if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+					String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","THONG_BAO_PRICE_HIGHER","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE}",info[3]).replaceAll("\\{PACKAGE_PRICE}",info[4]);
+					if(mt == null || mt.equals(""))
+						mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","THONG_BAO_PRICE_HIGHER","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE}",info[3]).replaceAll("\\{PACKAGE_PRICE}",info[4]);
+				
+					ret = sendSms(context.get("sharingkey"),mt);
+					System.out.println("ret:"+ret);												
+				}
+				context.put("ErrorCodeAPI","30"); context.put("ErrorDescAPI","Khach hang dang su dung goi cuoc co gia cao hon.");	
+				logSql(msisdn,"-1","CHECK_THUE_BAO_SU_DUNG_GOI_CUOC_CAOTHAP_DICH_VU_MI_FC","7","CHECK_THUE_BAO_SU_DUNG_GOI_CUOC_CAOTHAP_DICH_VU_MI_FC",context.get("checkservice_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkservice_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);				
+				return false;
+			}
+		}
+		else if (info[0].equals("1")){							
+			//return tid+":INFO:So thue bao "+receiver+" da dang ky su dung dich vu "+obj.getServiceKey()+". De nghi dang ky khong thanh cong.";
+			if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+				String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","SERVICE_IN_USE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+				if(mt == null || mt.equals(""))
+					mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","SERVICE_IN_USE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS"));
+				ret = sendSms(context.get("sharingkey"),mt);
+				System.out.println("ret:"+ret);												
+			}
+			context.put("ErrorCodeAPI","31"); context.put("ErrorDescAPI","Khach hang dang su dung goi cuoc co gia bang goi dang dang ky.");				
+			logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);	
+			return false;		
+		}
+		else if (info[0].equals("10")){
+			//return tid+":INFO:Thong bao: Khach hang "+receiver+" dang su dung goi cuoc MI "+info[1]+" gia cuoc "+info[2]+"dong. Ban KHONG THE gioi thieu dang ky voi goi cuoc thap hon hoac bang, hay gioi thieu goi cuoc CAO HON hoac goi 9090 de duoc ho tro.";
+			if(context.get("SEND_SMS").equals("1") && context.get("channel").equals("SMS")){
+				String mt = getValueFromKeyMultiRecords($soap_34_extract1,"record","MT_TYPE_KEY","MI_KM120_NOTICE_CHAN","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE}",info[3]).replaceAll("\\{PACKAGE_PRICE}",info[4]);
+				if(mt == null || mt.equals(""))
+					mt = getValueFromKeyMultiRecords($soap_8_extract1,"record","MT_TYPE_KEY","MI_KM120_NOTICE_CHAN","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{SERVICE_NAME}",context.get("SERVICE_KEY_SMS")).replaceAll("\\{PACKAGE_CODE}",info[3]).replaceAll("\\{PACKAGE_PRICE}",info[4]);
+				ret = sendSms(context.get("sharingkey"),mt);
+				System.out.println("ret:"+ret);												
+			}
+			context.put("ErrorCodeAPI","32"); context.put("ErrorDescAPI","Khach hang dang su dung goi cuoc co gia bang goi dang dang ky.");				
+			logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);	
+			return false;				
+		}
+		else if (info[0].equals("-1")){
+			context.put("ErrorCodeAPI","-1"); context.put("ErrorDescAPI","Loi khong tra cuu duoc thong tin.");				
+			logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);	
+			ret = sendSms(context.get("sharingkey"),"Giao dich khong thanh cong do ma goi cuoc thue bao dang su dung chua duoc cap nhat tren he thong.");
+			return false;	
+		}
+		
+	}
+	stepResult = true;
+	logSql(msisdn,"-1","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC","7","CHECK_THUE_BAO_HUY_DICH_VU_MI_FC",context.get("checkhuy_cmdRequest_with_value")+"|stepResult="+stepResult,context.get("checkhuy_cmdresponse_with_value")+"|stepResult="+stepResult,context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);	
+	System.out.println("ACV--");
+	return true;
+}catch(Exception ex){
+	ex.printStackTrace();
+	System.out.println(ex.getMessage());
+	return false;
+}

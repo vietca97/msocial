@@ -21,13 +21,13 @@ public class RegisterServicePartnerController {
     private String test;
 
     private final UtilServices utilServices;
-    private final RedisUtils redisUtils;
+    private final RedisUtils context;
     private final CheckAccountPartner checkAccountPartner;
 
     private final DefUtils defUtils;
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils redisUtils, CheckAccountPartner checkAccountPartner, DefUtils defUtils) {
-        this.redisUtils = redisUtils;
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, CheckAccountPartner checkAccountPartner, DefUtils defUtils) {
+        this.context = context;
         this.utilServices = utilServices;
         this.checkAccountPartner = checkAccountPartner;
         this.defUtils = defUtils;
@@ -49,6 +49,30 @@ public class RegisterServicePartnerController {
     public List<Step3DTO> step3(
     ) {
         return systemParameterServices.getDataStep3();
+    }
+
+    @GetMapping("/step")
+    public boolean step4(@RequestBody  List<Step3DTO> soap37){
+        boolean ret = false;
+        try{
+            //String content = "$content";
+            String content = "$body";
+        }catch(Exception ex){
+            context.put("content","");
+        }
+        try{
+            if(Integer.parseInt(soap37.get(0).getCHECK_ACCOUNT_API()) <1 ) ret = false;
+            else ret = true;
+        }catch(Exception ex){
+            ex.printStackTrace();
+            ret = false;
+        }finally{
+            if(!ret){
+                context.put("ErrorCodeAPI","-2");
+                context.put("ErrorDescAPI","Username/Password khong dung");
+            }
+            return ret;
+        }
     }
 
     @GetMapping("/step8")

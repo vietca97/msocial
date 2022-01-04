@@ -43,6 +43,14 @@ public class RedisUtils {
         return jedis.get(serviceName);
     }
 
+    public  void put(String key, String value){
+        if(jedisPool == null ){
+            init();
+        }
+        Jedis jedis = jedisPool.getResource();
+       jedis.append(key,value);
+    }
+
     public  void init(){
         String[] host = redisServer.split(";");
         String[] port = redisPort.split(";");

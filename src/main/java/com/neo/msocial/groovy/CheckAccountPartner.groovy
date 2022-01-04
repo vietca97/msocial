@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component
 @Component
 class CheckAccountPartner {
 
-    @Autowired
-    private
     def getValueFromKey = { String body, String key ->
         String ret = "";
         try {

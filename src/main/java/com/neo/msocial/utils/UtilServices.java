@@ -76,8 +76,6 @@ public class UtilServices {
 
 
     public String callSoapVasGate (RegisterServicePartnerDTO dto) {
-
-
         StringBuilder str_soap = new StringBuilder();
         str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
         str_soap.append("<soapenv:Header/><soapenv:Body>");

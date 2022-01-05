@@ -2,10 +2,7 @@ package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
 import com.neo.msocial.groovy.*;
-import com.neo.msocial.request.RequestStep18;
-import com.neo.msocial.request.RequestStep20;
-import com.neo.msocial.request.RequestStep22;
-import com.neo.msocial.request.RequestStep6;
+import com.neo.msocial.request.*;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
@@ -25,8 +22,10 @@ public class RegisterServicePartnerController {
     private final CheckSpam checkSpam;
     private final CheckChongLoiDung checkChongLoiDung;
     private final CheckStep6 checkStep6;
+    private final CheckThuebaoHuyDichVu checkThuebaoHuyDichVu;
+    private final CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu;
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung, CheckStep6 checkStep6) {
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung, CheckStep6 checkStep6, CheckThuebaoHuyDichVu checkThuebaoHuyDichVu, CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu) {
 
         this.context = context;
         this.utilServices = utilServices;
@@ -34,6 +33,8 @@ public class RegisterServicePartnerController {
         this.checkSpam = checkSpam;
         this.checkChongLoiDung = checkChongLoiDung;
         this.checkStep6 = checkStep6;
+        this.checkThuebaoHuyDichVu = checkThuebaoHuyDichVu;
+        this.checkThueBaoSuDungDichVu = checkThueBaoSuDungDichVu;
     }
 
     @PostMapping("/step1")
@@ -241,6 +242,26 @@ public class RegisterServicePartnerController {
                 request.getMsisdn(),
                 request.getServiceid());
     }
+
+    @GetMapping("/step25")
+    public boolean step25(@RequestBody RequestStep25 request) {
+        return checkThueBaoSuDungDichVu.checkThueBao(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getSharingKey(),
+                request.getMsisdn(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
+    }
+
+    @GetMapping("/step28")
+    public boolean step28() {
+        return checkThuebaoHuyDichVu.checkThueBaoHuy();
+    }
+
+
 
 
 }

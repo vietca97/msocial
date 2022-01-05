@@ -155,9 +155,7 @@ soap_9:service_package_info
 soap_12:partner_info
 */
 
-    boolean
-
-    bussiness(
+    boolean bussiness(
             List<Soap8> $soap_8_extract1,
             List<Soap12> $soap_12_extract1,
             List<Soap34> $soap_34_extract1,

@@ -234,7 +234,7 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step22")
-    public boolean step20(@RequestBody RequestStep22 request) {
+    public boolean step22(@RequestBody RequestStep22 request) {
         return checkChongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap34(),

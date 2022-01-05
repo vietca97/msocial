@@ -53,7 +53,7 @@ public class RegisterServicePartnerController {
         return systemParameterServices.getDataStep3(lst);
     }
 
-    @GetMapping("/step4")
+    @PostMapping("/step4")
     public boolean step4(@RequestBody List<Soap37> soap37) {
         boolean ret = false;
         try {
@@ -131,7 +131,7 @@ public class RegisterServicePartnerController {
         return systemParameterServices.getDataStep16();
     }
 
-    @GetMapping("/step18")
+    @PostMapping("/step18")
     public void step18(
             @RequestBody RequestStep18 request
             ) {
@@ -211,7 +211,7 @@ public class RegisterServicePartnerController {
         }
     }
 
-    @GetMapping("/step19")
+    @PostMapping("/step19")
     public void step19(@RequestBody List<Soap34> lst) {
         for (Soap34 record : lst) {
             context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
@@ -233,7 +233,7 @@ public class RegisterServicePartnerController {
                 request.getChannel(),request.getSharingKeyId(),request.getMsisdn());
     }
 
-    @GetMapping("/step22")
+    @PostMapping("/step22")
     public boolean step20(@RequestBody RequestStep22 request) {
         return checkChongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
@@ -243,7 +243,7 @@ public class RegisterServicePartnerController {
                 request.getServiceid());
     }
 
-    @GetMapping("/step25")
+    @PostMapping("/step25")
     public boolean step25(@RequestBody RequestStep25 request) {
         return checkThueBaoSuDungDichVu.checkThueBao(
                 request.getLstSoap34(),
@@ -256,7 +256,7 @@ public class RegisterServicePartnerController {
         );
     }
 
-    @GetMapping("/step28")
+    @PostMapping("/step28")
     public boolean step28() {
         return checkThuebaoHuyDichVu.checkThueBaoHuy();
     }

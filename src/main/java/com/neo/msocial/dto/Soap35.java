@@ -1,22 +1,66 @@
 package com.neo.msocial.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.Entity;
 
 public class Soap35 {
+
+    @JsonProperty("JOB_EXP_DATA_DIR_EXP_LOCAL")
     private String JOB_EXP_DATA_DIR_EXP_LOCAL;
+    public static final String  jobExpDataDirExpLocal = "JOB_EXP_DATA_DIR_EXP_LOCAL";
+
+    @JsonProperty("JOB_EXP_DATA_DIR_FTP")
     private String JOB_EXP_DATA_DIR_FTP;
+    public static final String  jobExpDataDirFtp = "JOB_EXP_DATA_DIR_FTP";
+
+    @JsonProperty("LIST_EMAIL_REPORT_DUYTRI")
     private String LIST_EMAIL_REPORT_DUYTRI;
+    public static final String  listEmailReportDuytri = "LIST_EMAIL_REPORT_DUYTRI";
+
+    @JsonProperty("LIST_EMAIL_REPORT_JOB")
     private String LIST_EMAIL_REPORT_JOB;
+    public static final String  listEmailReportJob = "LIST_EMAIL_REPORT_JOB";
+
+    @JsonProperty("LIST_EMAIL_REPORT_PHATSINH")
     private String LIST_EMAIL_REPORT_PHATSINH;
+    public static final String  listEmailReportPhatsinh = "LIST_EMAIL_REPORT_PHATSINH";
+
+    @JsonProperty("LOCK_TIME")
     private String LOCK_TIME;
+    public static final String  lockTime = "LOCK_TIME";
+
+    @JsonProperty("LOGIN_MAX")
     private String LOGIN_MAX;
+    public static final String  loginMax = "LOGIN_MAX";
+
+    @JsonProperty("LOGSYSTEM")
     private String LOGSYSTEM;
+    public static final String logSystem = "LOGSYSTEM";
+
+    @JsonProperty("ON_OFF_LOCK")
     private String ON_OFF_LOCK;
+    public static final String onOffLock = "ON_OFF_LOCK";
+
+    @JsonProperty("SERVER_FROM")
     private String SERVER_FROM;
+    public static final String serverFrom = "SERVER_FROM";
+
+    @JsonProperty("SERVER_PORT")
     private String SERVER_PORT;
+    public static final String serverPort = "SERVER_PORT";
+
+    @JsonProperty("SERVER_HOST")
     private String SERVER_HOST;
+    public static final String serverHost = "SERVER_HOST";
+
+    @JsonProperty("SERVER_PASS")
     private String SERVER_PASS;
+    public static final String serverPass = "SERVER_PASS";
+
+    @JsonProperty("SERVER_USER")
     private String SERVER_USER;
+    public static final String serverUser = "SERVER_USER";
 
     public Soap35() {
     }

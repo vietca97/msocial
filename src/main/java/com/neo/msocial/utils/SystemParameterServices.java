@@ -3,7 +3,7 @@ package com.neo.msocial.utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.neo.msocial.constant.Parameter;
-import com.neo.msocial.constant.StepUrl;
+import com.neo.msocial.constant.RequestUrl;
 import com.neo.msocial.dto.*;
 
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class SystemParameterServices {
 
     public List<Soap35> getDataStep2() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_2_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_2_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<SystemParameter>>() {
         }.getType();
@@ -90,9 +90,9 @@ public class SystemParameterServices {
         return listResult;
     }
 
-    public List<Soap37> getDataStep3() {
+    public List<Soap37> getDataStep3(List<Soap35> lst) {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_3_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_3_URL + "&P1="+ lst.get(0).getSERVER_USER() + "&P2="+ lst.get(0).getSERVER_PASS(), String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap37>>() {}.getType();
         List<Soap37> objectsList = new Gson().fromJson(result, typeOfObjectsList);
@@ -101,7 +101,7 @@ public class SystemParameterServices {
 
     public List<Soap15>  getDataStep8() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_8_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_8_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap15>>() {}.getType();
         List<Soap15> objectsList = new Gson().fromJson(result, typeOfObjectsList);
@@ -110,7 +110,7 @@ public class SystemParameterServices {
 
     public List<Soap8> getDataStep9() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_9_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_9_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap8>>() {}.getType();
         List<Soap8> objectsList = new Gson().fromJson(result, typeOfObjectsList);
@@ -119,7 +119,7 @@ public class SystemParameterServices {
 
     public  List<Soap9> getDataStep10() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_10_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_10_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<List<Soap9>>() {}.getType();
         List<Soap9> objectsList = new Gson().fromJson(result, typeOfObjectsList);
@@ -129,7 +129,7 @@ public class SystemParameterServices {
 
     public  List<Soap12> getDataStep11() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_11_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_11_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         String resultReplace = result.replace("\\","");
         Type typeOfObjectsList = new TypeToken<List<Soap12>>() {}.getType();
@@ -139,7 +139,7 @@ public class SystemParameterServices {
 
     public  List<Soap14> getDataStep12() {
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_12_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_12_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         String resultReplace = result.replace("\\","");
         Type typeOfObjectsList = new TypeToken<List<Soap14>>() {}.getType();
@@ -149,7 +149,7 @@ public class SystemParameterServices {
 
     public List<Soap28> getDataStep13(){
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_13_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_13_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
         Type typeOfObjectsList = new TypeToken<List<Soap28>>(){}.getType();
@@ -159,7 +159,7 @@ public class SystemParameterServices {
 
     public List<Soap16> getDataStep14(){
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_14_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_14_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
         Type typeOfObjectsList = new TypeToken<List<Soap16>>(){}.getType();
@@ -169,7 +169,7 @@ public class SystemParameterServices {
 
     public List<Soap17> getDataStep15(){
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_15_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_15_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
         Type typeOfObjectsList = new TypeToken<List<Soap17>>(){}.getType();
@@ -179,11 +179,40 @@ public class SystemParameterServices {
 
     public List<Soap19> getDataStep16(){
         RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(StepUrl.STEP_16_URL, String.class);
+        String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_16_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
         Type typeOfObjectsList = new TypeToken<List<Soap19>>(){}.getType();
         List<Soap19> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
+
+    public String getDataCheckLockDb(String sharingKeyId){
+        //"return": 0
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(RequestUrl.Check.LOCK_DB + "&P1=" + sharingKeyId, String.class);
+        return response.split("\"return\":")[1];
+    }
+
+    public List<PolicyDTO> getDataCheckPolicy(String script_shop_id, String msisdn){
+        //"return": 0
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(RequestUrl.Check.POLICY + "&P1=" + script_shop_id + "&P2=" + msisdn, String.class);
+        String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
+        String resultReplace= result.replace("\\","");;
+        Type typeOfObjectsList = new TypeToken<List<PolicyDTO>>(){}.getType();
+        List<PolicyDTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
+
+    public List<PolicyDTO> getDataCheckPrice(String script_shop_id, String msisdn, String serviceid){
+        //"return": 0
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(RequestUrl.Check.PRICE + "&P1=" + script_shop_id + "&P2=" + msisdn + "&P3=" + serviceid, String.class);
+        String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
+        String resultReplace= result.replace("\\","");;
+        Type typeOfObjectsList = new TypeToken<List<PolicyDTO>>(){}.getType();
+        List<PolicyDTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
         return objectsList;
     }
 }

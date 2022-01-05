@@ -21,16 +21,22 @@ public class Soap28 {
     public static final String maintainCycle = "MAINTAIN_CYCLE";
     public String MAINTAIN_DAYS;
     public static final String maintainDays = "MAINTAIN_DAYS";
+
     public String REGISTERS_DAYS;
-    public static final String refusedtotal = "REFUSEDTOTAL";
+    public static final String registersDays = "REGISTERS_DAYS";
+
     public String SEND_SMS_SHARING_KEY;
     public static final String sendSmsSharingKey = "SEND_SMS_SHARING_KEY";
+
     public String SCRIPT_SHOP_STATUS;
     public static final String scriptShopStatus = "SCRIPT_SHOP_STATUS";
+
     public String SCRIPT_SHOP_TYPE_KEY;
     public static final String scriptShopTypeKey = "SCRIPT_SHOP_TYPE_KEY";
+
     public String SCRIPT_SHOP_TYPE_VALUE;
     public static final String scriptShopTypeValue = "SCRIPT_SHOP_TYPE_VALUE";
+
     public String SO_NGAY_CHECKHUY;
     public static final String soNgayCheckhuy = "SO_NGAY_CHECKHUY";
 

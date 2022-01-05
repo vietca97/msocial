@@ -2,7 +2,12 @@ package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
 import com.neo.msocial.groovy.CheckAccountPartner;
+import com.neo.msocial.groovy.CheckChongLoiDung;
+import com.neo.msocial.groovy.CheckSpam;
 import com.neo.msocial.groovy.DefUtils;
+import com.neo.msocial.request.RequestStep18;
+import com.neo.msocial.request.RequestStep20;
+import com.neo.msocial.request.RequestStep22;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
@@ -15,25 +20,20 @@ import java.util.List;
 
 @RestController
 public class RegisterServicePartnerController {
-    @Autowired
-    SystemParameterServices systemParameterServices;
 
-    @Value("${vasgate.soapapi}")
-    private String test;
-
+    private final SystemParameterServices systemParameterServices;
     private final UtilServices utilServices;
     private final RedisUtils context;
+    private final CheckSpam checkSpam;
+    private final CheckChongLoiDung checkChongLoiDung;
 
-    private final CheckAccountPartner checkAccountPartner;
-
-    private final DefUtils defUtils;
-
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, CheckAccountPartner checkAccountPartner, DefUtils defUtils) {
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung) {
 
         this.context = context;
         this.utilServices = utilServices;
-        this.checkAccountPartner = checkAccountPartner;
-        this.defUtils = defUtils;
+        this.systemParameterServices = systemParameterServices;
+        this.checkSpam = checkSpam;
+        this.checkChongLoiDung = checkChongLoiDung;
     }
 
     @PostMapping("/step1")
@@ -43,26 +43,18 @@ public class RegisterServicePartnerController {
 
     @GetMapping("/step2")
     public List<Soap35> step2() {
-
-        //dataflow_param:sqlmodule
         return systemParameterServices.getDataStep2();
     }
 
-    @GetMapping("/step3")
-    public List<Soap37> step3(
+    @PostMapping("/step3")
+    public List<Soap37> step3(@RequestBody List<Soap35> lst
     ) {
-        return systemParameterServices.getDataStep3();
+        return systemParameterServices.getDataStep3(lst);
     }
 
     @GetMapping("/step4")
     public boolean step4(@RequestBody List<Soap37> soap37) {
         boolean ret = false;
-        try {
-            //String content = "$content";
-            String content = "$body";
-        } catch (Exception ex) {
-            context.put("content", "");
-        }
         try {
             if (Integer.parseInt(soap37.get(0).getCHECK_ACCOUNT_API()) < 1) ret = false;
             else ret = true;
@@ -70,11 +62,10 @@ public class RegisterServicePartnerController {
             ex.printStackTrace();
             ret = false;
         } finally {
-            //test thi dong cai nay lai
-//            if(!ret){
-//                context.put("ErrorCodeAPI","-2");
-//                context.put("ErrorDescAPI","Username/Password khong dung");
-//            }
+            if(!ret){
+                context.put("ErrorCodeAPI","-2");
+                context.put("ErrorDescAPI","Username/Password khong dung");
+            }
             return ret;
         }
     }
@@ -135,26 +126,82 @@ public class RegisterServicePartnerController {
 
     @GetMapping("/step18")
     public void step18(
-            @RequestBody List<Soap35> lstSoap35,
-            @RequestBody List<Soap9> lstSoap9,
-            @RequestBody List<Soap12> lstSoap12,
-            @RequestBody List<Soap28> lstSoap28
-    ) {
-            for(Soap35 record : lstSoap35){
-                context.put(record.text().split(":")[0],record.text().split(":")[1]);
-            }
-            rootNode = new XmlSlurper().parseText($soap_9_extract1);
-            for(def record : rootNode.record.children()){
-                context.put(record.name(),record.text());
-            }
-            rootNode = new XmlSlurper().parseText($soap_12_extract1);
-            for(def record : rootNode.record.children()){
-                context.put(record.name(),record.text());
-            }
-            rootNode = new XmlSlurper().parseText($soap_28_extract1);
-            for(def record : rootNode.record.children()){
-                context.put(record.name(),record.text());
-            }
+            @RequestBody RequestStep18 request
+            ) {
+        for (Soap35 record : request.getLstSoap35()) {
+            context.put(Soap35.jobExpDataDirExpLocal, record.getJOB_EXP_DATA_DIR_EXP_LOCAL());
+            context.put(Soap35.jobExpDataDirFtp, record.getJOB_EXP_DATA_DIR_FTP());
+            context.put(Soap35.listEmailReportDuytri, record.getLIST_EMAIL_REPORT_DUYTRI());
+            context.put(Soap35.listEmailReportJob, record.getLIST_EMAIL_REPORT_JOB());
+            context.put(Soap35.listEmailReportPhatsinh, record.getLIST_EMAIL_REPORT_PHATSINH());
+            context.put(Soap35.lockTime, record.getLOCK_TIME());
+            context.put(Soap35.loginMax, record.getLOGIN_MAX());
+            context.put(Soap35.logSystem, record.getLOGSYSTEM());
+            context.put(Soap35.onOffLock, record.getON_OFF_LOCK());
+            context.put(Soap35.serverFrom, record.getSERVER_FROM());
+            context.put(Soap35.serverHost, record.getSERVER_HOST());
+            context.put(Soap35.serverPass, record.getSERVER_PASS());
+            context.put(Soap35.serverPort, record.getSERVER_PORT());
+            context.put(Soap35.serverUser, record.getSERVER_USER());
+        }
+
+        for (Soap9 record : request.getLstSoap9()) {
+            context.put(Soap9.serviceKey, record.getSERVICE_KEY());
+            context.put(Soap9.serviceKeySms, record.getSERVICE_KEY_SMS());
+            context.put(Soap9.capacity, record.getCAPACITY());
+            context.put(Soap9.changePackage, record.getCHANGE_PACKAGE());
+            context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
+
+            context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
+            context.put(Soap9.haveCheckHuyWith5, record.getHAVE_CHECK_HUY_WITH_5());
+            context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
+            context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
+            context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
+
+            context.put(Soap9.packageCode, record.getPACKAGE_CODE());
+            context.put(Soap9.packageCodeApi, record.getPACKAGE_CODE_API());
+            context.put(Soap9.packageCodeSms, record.getPACKAGE_CODE_SMS());
+            context.put(Soap9.packageCodeStatus, record.getPACKAGE_CODE_STATUS());
+            context.put(Soap9.packageCycle, record.getPACKAGE_CYCLE());
+
+            context.put(Soap9.packageDynamic, record.getPACKAGE_DYNAMIC());
+            context.put(Soap9.packagePrice, record.getPACKAGE_PRICE());
+            context.put(Soap9.packageType, record.getPACKAGE_TYPE());
+            context.put(Soap9.serviceId, record.getSERVICE_ID());
+            context.put(Soap9.serviceInfo, record.getSERVICE_INFO());
+
+            context.put(Soap9.serviceName, record.getSERVICE_NAME());
+            context.put(Soap9.serviceNameSms, record.getSERVICE_NAME_SMS());
+            context.put(Soap9.splitTip, record.getSPLIT_TIP());
+        }
+
+        for (Soap12 record : request.getLstSoap12()) {
+            context.put(Soap12.partnerKey, record.getPARTNER_KEY());
+            context.put(Soap12.partnerName, record.getPARTNER_NAME());
+            context.put(Soap12.partnerType, record.getPARTNER_TYPE());
+            context.put(Soap12.sendSms, record.getSEND_SMS());
+        }
+
+        for (Soap28 record : request.getLstSoap28()) {
+            context.put(Soap28.scriptShopTypeKey, record.getSCRIPT_SHOP_TYPE_KEY());
+            context.put(Soap28.sendSmsSharingKey, record.getSEND_SMS_SHARING_KEY());
+            context.put(Soap28.channelId, record.getCHANNEL_ID());
+            context.put(Soap28.chargingType, record.getCHARGING_TYPE());
+            context.put(Soap28.endTime, record.getEND_TIME());
+
+            context.put(Soap28.haveMaintain, record.getHAVE_MAINTAIN0());
+            context.put(Soap28.maintainCycle, record.getMAINTAIN_CYCLE());
+            context.put(Soap28.maintainDays, record.getMAINTAIN_DAYS());
+            context.put(Soap28.packageCodeId, record.getPACKAGE_CODE_ID());
+            context.put(Soap28.registersDays, record.getREGISTERS_DAYS());
+
+            context.put(Soap28.scriptShopStatus, record.getSCRIPT_SHOP_STATUS());
+            context.put(Soap28.scriptShopTypeValue, record.getSCRIPT_SHOP_TYPE_VALUE());
+            context.put(Soap28.scriptTypeId, record.getSCRIPT_TYPE_ID());
+            context.put(Soap28.serviceId, record.getSERVICE_ID());
+            context.put(Soap28.soNgayCheckhuy, record.getSO_NGAY_CHECKHUY());
+            context.put(Soap28.startTime, record.getSTART_TIME());
+        }
     }
 
     @GetMapping("/step19")
@@ -163,6 +210,30 @@ public class RegisterServicePartnerController {
             context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
             context.put(Soap34.mtTypeValue, record.getMT_TYPE_VALUE());
         }
+    }
+
+    @PostMapping("/step20")
+    public boolean step20(@RequestBody RequestStep20 request) {
+        return checkSpam.checksendSms(
+                request.getLstSoap8(),
+                request.getLstSoap12(),
+                request.getLstSoap14(),
+                request.getLstSoap15(),
+                request.getLstSoap16(),
+                request.getLstSoap17(),
+                request.getLstSoap19(),
+                request.getLstSoap34(),
+                request.getChannel(),request.getSharingKeyId(),request.getMsisdn());
+    }
+
+    @GetMapping("/step22")
+    public boolean step20(@RequestBody RequestStep22 request) {
+        return checkChongLoiDung.bussiness(request.getLstSoap8(),
+                request.getLstSoap12(),
+                request.getLstSoap34(),
+                request.getScript_shop_id(),
+                request.getMsisdn(),
+                request.getServiceid());
     }
 
 

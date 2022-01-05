@@ -39,67 +39,54 @@ public class SystemParameterServices {
 
     public List<SystemParameterDTO_Step2> getDataConvertSingle(List<Step2DTO> lst) {
         List<SystemParameterDTO_Step2> listResult = new ArrayList<>();
+        SystemParameterDTO_Step2 dto = new SystemParameterDTO_Step2();
         for (Step2DTO obj : lst) {
-            SystemParameterDTO_Step2 dto = new SystemParameterDTO_Step2();
             switch (obj.getSYSTEM_PARAMETER().split(":")[0]) {
                 case Parameter.JOB_EXP_DATA_DIR_EXP_LOCAL:
                     dto.setJOB_EXP_DATA_DIR_EXP_LOCAL(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.JOB_EXP_DATA_DIR_FTP:
                     dto.setJOB_EXP_DATA_DIR_FTP(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_DUYTRI:
                     dto.setLIST_EMAIL_REPORT_DUYTRI(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_JOB:
                     dto.setLIST_EMAIL_REPORT_JOB(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_PHATSINH:
                     dto.setLIST_EMAIL_REPORT_PHATSINH(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LOCK_TIME:
                     dto.setLOCK_TIME(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LOGIN_MAX:
                     dto.setLOGIN_MAX(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.LOGSYSTEM:
                     dto.setLOGSYSTEM(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.ON_OFF_LOCK:
                     dto.setON_OFF_LOCK(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.SERVER_FROM:
                     dto.setSERVER_FROM(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.SERVER_HOST:
                     dto.setSERVER_HOST(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.SERVER_PASS:
                     dto.setSERVER_PASS(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.SERVER_PORT:
                     dto.setSERVER_PORT(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
                 case Parameter.SERVER_USER:
                     dto.setSERVER_USER(obj.getSYSTEM_PARAMETER().split(":")[0]);
-                    listResult.add(dto);
                     break;
             }
         }
+        listResult.add(dto);
         return listResult;
     }
 
@@ -130,7 +117,7 @@ public class SystemParameterServices {
         return objectsList;
     }
 
-    public static List<Step10DTO> getDataStep10() {
+    public  List<Step10DTO> getDataStep10() {
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(StepUrl.STEP_10_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
@@ -140,7 +127,7 @@ public class SystemParameterServices {
         return objectsList;
     }
 
-    public static List<Step11DTO> getDataStep11() {
+    public  List<Step11DTO> getDataStep11() {
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(StepUrl.STEP_11_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
@@ -150,14 +137,53 @@ public class SystemParameterServices {
         return objectsList;
     }
 
-    public List<StepDTO13> getDataStep13(){
+    public  List<Step12DTO> getDataStep12() {
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(StepUrl.STEP_12_URL, String.class);
+        String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
+        String resultReplace = result.replace("\\","");
+        Type typeOfObjectsList = new TypeToken<List<Step12DTO>>() {}.getType();
+        List<Step12DTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
+
+    public List<Step13DTO> getDataStep13(){
         RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(StepUrl.STEP_13_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
-        Type typeOfObjectsList = new TypeToken<StepDTO13>(){}.getType();
-        List<StepDTO13> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        Type typeOfObjectsList = new TypeToken<List<Step13DTO>>(){}.getType();
+        List<Step13DTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
         return objectsList;
     }
 
+    public List<Step14DTO> getDataStep14(){
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(StepUrl.STEP_14_URL, String.class);
+        String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
+        String resultReplace= result.replace("\\","");;
+        Type typeOfObjectsList = new TypeToken<List<Step14DTO>>(){}.getType();
+        List<Step14DTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
+
+    public List<Step15DTO> getDataStep15(){
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(StepUrl.STEP_15_URL, String.class);
+        String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
+        String resultReplace= result.replace("\\","");;
+        Type typeOfObjectsList = new TypeToken<List<Step15DTO>>(){}.getType();
+        List<Step15DTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
+
+    public List<Step16DTO> getDataStep16(){
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(StepUrl.STEP_16_URL, String.class);
+        String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
+        String resultReplace= result.replace("\\","");;
+        Type typeOfObjectsList = new TypeToken<List<Step16DTO>>(){}.getType();
+        List<Step16DTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
+        return objectsList;
+    }
 }

@@ -1,11 +1,20 @@
 package com.neo.msocial.dto;
 
 public class Step9DTO {
-    public String MT_TYPE_NAME;
-    public String MT_TYPE_DEFAULT;
-    public String MT_TYPE_KEY;
-    public String MT_TYPE_VALUE;
-    public String MT_TYPE_DESC;
+    private String MT_TYPE_NAME;
+    public  static final String mtTypeName="MT_TYPE_NAME";
+
+    private String MT_TYPE_DEFAULT;
+    public  static final String mtTypeDefault="MT_TYPE_DEFAULT";
+
+    private String MT_TYPE_KEY;
+    public  static final String mtTypeKey="MT_TYPE_KEY";
+
+    private String MT_TYPE_VALUE;
+    public  static final String mtTypeValue="MT_TYPE_VALUE";
+
+    private String MT_TYPE_DESC;
+    public  static final String mtTypeDesc="MT_TYPE_DESC";
 
     public Step9DTO() {
     }

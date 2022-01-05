@@ -12,21 +12,24 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 public class RegisterServicePartnerController {
     @Autowired
-     SystemParameterServices systemParameterServices;
+    SystemParameterServices systemParameterServices;
 
     @Value("${vasgate.soapapi}")
     private String test;
 
     private final UtilServices utilServices;
     private final RedisUtils context;
+
     private final CheckAccountPartner checkAccountPartner;
 
     private final DefUtils defUtils;
 
     public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, CheckAccountPartner checkAccountPartner, DefUtils defUtils) {
+
         this.context = context;
         this.utilServices = utilServices;
         this.checkAccountPartner = checkAccountPartner;
@@ -51,26 +54,27 @@ public class RegisterServicePartnerController {
         return systemParameterServices.getDataStep3();
     }
 
-    @GetMapping("/step")
-    public boolean step4(@RequestBody  List<Step3DTO> soap37){
+    @GetMapping("/step4")
+    public boolean step4(@RequestBody List<Step3DTO> soap37) {
         boolean ret = false;
-        try{
+        try {
             //String content = "$content";
             String content = "$body";
-        }catch(Exception ex){
-            context.put("content","");
+        } catch (Exception ex) {
+            context.put("content", "");
         }
-        try{
-            if(Integer.parseInt(soap37.get(0).getCHECK_ACCOUNT_API()) <1 ) ret = false;
+        try {
+            if (Integer.parseInt(soap37.get(0).getCHECK_ACCOUNT_API()) < 1) ret = false;
             else ret = true;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             ret = false;
-        }finally{
-            if(!ret){
-                context.put("ErrorCodeAPI","-2");
-                context.put("ErrorDescAPI","Username/Password khong dung");
-            }
+        } finally {
+            //test thi dong cai nay lai
+//            if(!ret){
+//                context.put("ErrorCodeAPI","-2");
+//                context.put("ErrorDescAPI","Username/Password khong dung");
+//            }
             return ret;
         }
     }
@@ -99,10 +103,34 @@ public class RegisterServicePartnerController {
         return systemParameterServices.getDataStep11();
     }
 
+    @GetMapping("/step12")
+    public List<Step12DTO> step12(
+    ) {
+        return systemParameterServices.getDataStep12();
+    }
+
     @GetMapping("/step13")
-    public List<StepDTO13> step13(
+    public List<Step13DTO> step13(
     ) {
         return systemParameterServices.getDataStep13();
+    }
+
+    @GetMapping("/step14")
+    public List<Step14DTO> step14(
+    ) {
+        return systemParameterServices.getDataStep14();
+    }
+
+    @GetMapping("/step15")
+    public List<Step15DTO> step15(
+    ) {
+        return systemParameterServices.getDataStep15();
+    }
+
+    @GetMapping("/step16")
+    public List<Step16DTO> step16(
+    ) {
+        return systemParameterServices.getDataStep16();
     }
 
 

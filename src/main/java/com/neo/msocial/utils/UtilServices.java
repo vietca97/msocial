@@ -25,7 +25,7 @@ public class UtilServices {
     @Value("${vasgate.soapapi}")
     private String urlSoap;
 
-    public  String callSoapHttp (String xml, String url_api) {
+    public static String callSoapHttp (String xml, String url_api) {
         String v = "";
         StringBuilder response = new StringBuilder();
         Date d = new Date();
@@ -75,7 +75,7 @@ public class UtilServices {
 
 
 
-    public String callSoapVasGate (RegisterServicePartnerDTO dto) {
+    public  String callSoapVasGate (RegisterServicePartnerDTO dto) {
         StringBuilder str_soap = new StringBuilder();
         str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
         str_soap.append("<soapenv:Header/><soapenv:Body>");
@@ -106,7 +106,7 @@ public class UtilServices {
         }
     }
 
-    public String getValueResult (String xml) {
+    public static String getValueResult (String xml) {
         String v = "";
         if (xml==null) return "";
         try{

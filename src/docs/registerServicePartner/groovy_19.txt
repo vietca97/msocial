@@ -1,0 +1,21 @@
+try{	
+	def rootNode = new XmlSlurper().parseText($soap_35_extract1);
+	for(def record : rootNode.record.children()){
+		context.put(record.text().split(":")[0],record.text().split(":")[1]);
+	}
+	rootNode = new XmlSlurper().parseText($soap_9_extract1);
+	for(def record : rootNode.record.children()){
+		context.put(record.name(),record.text());
+	}
+	rootNode = new XmlSlurper().parseText($soap_12_extract1);
+	for(def record : rootNode.record.children()){
+		context.put(record.name(),record.text());
+	}
+	rootNode = new XmlSlurper().parseText($soap_28_extract1);
+	for(def record : rootNode.record.children()){
+		context.put(record.name(),record.text());
+	}
+
+}catch(Exception ex){
+	ex.printStackTrace();
+}

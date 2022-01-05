@@ -1,0 +1,50 @@
+1.Module Util: /vasplatform/msocial/app/mbf-util-1.0
+
+2.Module Server-Sql-Module: /vasplatform/msocial/app/Server-Sql-Module
+
+3.Module Server-Sql-Module_DataFlow : /vasplatform/msocial/app/Server-Sql-Module_DataFlow
+
+Thông tin server:
+
+10.252.12.237
+
+root/123456a@
+
+đọc ví dụ cách call
+
+
+/vasplatform/msocial/app/df
+
+/vasplatform/msocial/app/df/WEB-INF/classes/neo/service/Activation.class
+
+#vào đay xem hàm nó call ham nao hay cau lenh là gi roi xem trong database
+/vasplatform/msocial/app/Server-Sql-Module_DataFlow/app/WEB-INF/classes
+
+=========> sql.properties
+
+ví dụ: hàm trên sql_check_password_partner
+
+nó sẽ gọi vào hàm sql_check_password_partner
+
+sql_check_password_partner = select count(*)
+ CHECK_ACCOUNT_API from msocial.user_info a inner join msocial.partner b on a.PARTNER_ID = b.ID inner join msocial.PARTNER_TYPE c on c.id = b.PARTNER_TYPE_ID and c.PARTNER_TYPE = 'API' where a.USER_ID = :1 and  a.PASSWORD = UTIL.GETMD5(UTIL.GETMD5(:2))
+
+nhìn thế này là sẽ lấy trong bảng user_info
+
+e vào lấy ra mấy cái mà test
+
+thông tin db:
+10.252.10.221
+
+sid:MPAY
+
+user: msocial
+
+pass: msocial2020
+
+
+================================================
+# Connection Redis
+1. cd /app/redis/redis-3.0.5/src
+2. ./redis-cli
+3. get dataflow_param:utilmodule

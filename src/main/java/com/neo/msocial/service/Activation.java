@@ -20,6 +20,7 @@ import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
@@ -33,6 +34,7 @@ import java.util.*;
 
 @Configuration
 @PropertySource("classpath:df.properties")
+@Component
 public class Activation {
     Logger logTask = Logger.getLogger("task"), logRequest = Logger.getLogger("request"), logOther = Logger.getLogger("others");
     public static JedisSentinelPool jedisPool = null;

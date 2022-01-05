@@ -17,9 +17,9 @@ public class RedisUtils {
     final  HashSet<String> sentinels = new HashSet<String>();
     public  JedisSentinelPool jedisPool = null;
 
-     String translog_database, translog_log_request;
-     String translog_update_request_status;
-     String translog_log_request_task;
+    String translog_database, translog_log_request;
+    String translog_update_request_status;
+    String translog_log_request_task;
 
     Gson gson = new Gson();
     public  JedisPoolConfig configPool = null;
@@ -35,7 +35,12 @@ public class RedisUtils {
     @SuppressWarnings("unused")
     private static int socketTimeout = 10000, soapTimeout = 100000;
 
-    public  String getValueService(String serviceName){
+    public RedisUtils(){
+        if(jedisPool == null ){
+            init();
+        }
+    }
+    public  String get(String serviceName){
         if(jedisPool == null ){
             init();
         }
@@ -43,17 +48,28 @@ public class RedisUtils {
         return jedis.get(serviceName);
     }
 
-    public  void put(String key, String value){
+    public void put(String key, String value){
         if(jedisPool == null ){
             init();
         }
         Jedis jedis = jedisPool.getResource();
-       jedis.append(key,value);
+        jedis.append(key,value);
+    }
+
+    public void set(String key, String value){
+        if(jedisPool == null ){
+            init();
+        }
+        Jedis jedis = jedisPool.getResource();
+        jedis.set(key,value);
     }
 
     public  void init(){
+        redisServer = "10.252.12.237;";
+        redisPort = "16379;";
         String[] host = redisServer.split(";");
         String[] port = redisPort.split(";");
+
         for (int i = 0; i < host.length; i++) {
             sentinels.add(host[i] + ":" + Integer.parseInt(port[i]));
         }
@@ -95,7 +111,8 @@ public class RedisUtils {
 
             while (it1.hasNext()) {
                 String key = it1.next();
-                String value = jedis.get(key);
+                String value = jedis.get(key)
+                        ;
 	            /* Su dung cho Site HCM? Check lai co che cho nay, nen de o file cau hinh:
 	            if (value!=null) {
 		            value = value.replace("10.54.4.129", "10.54.73.47");
@@ -111,7 +128,8 @@ public class RedisUtils {
             Iterator<String> it2 = srcset.iterator();
             while (it2.hasNext()) {
                 String key = it2.next();
-                String cfg = jedis.get(key);
+                String cfg = jedis.get(key)
+                        ;
                 System.out.println(key + "="+ cfg);
                 Map<String, String> props = gson.fromJson(cfg, new TypeToken<Map<String, String>>() {
                 }.getType());

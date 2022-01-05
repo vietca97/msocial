@@ -1,0 +1,16 @@
+def parseXML = { String soapResponse ->
+	
+	try{
+		if(!soapResponse.equals("<ResponseResult/>") && !soapResponse.equals("&lt;ResponseResult/>")){
+			rootNode = new XmlSlurper().parseText(soapResponse);
+			for(def record : rootNode.record.children()){
+				context.put(record.name(),record.text());
+			}
+		}
+	}catch(Exception ex){
+		System.out.prinln(ex.getMessage());
+		context.set("SCRIPT_MT_EMPTY",true);
+	}
+	
+}
+parseXML($soap_34_extract1);

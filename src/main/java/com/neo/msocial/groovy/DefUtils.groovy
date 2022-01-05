@@ -19,7 +19,7 @@ class DefUtils {
     private Activation activation;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private RedisUtils context;
 
     @Autowired
     private UtilServices utilServices;
@@ -190,7 +190,7 @@ soap_12:partner_info
 """;
             String ret = "";
             try {
-                ret = Activation().parseXMLtext(Activation().soapCall(context.get("dataflow_param:sqlmodule"), request), "//*[local-name() = 'return']");
+                ret = activation.parseXMLtext(activation.soapCall(context.get("dataflow_param:sqlmodule"), request), "//*[local-name() = 'return']");
 
                 String policyTypeName = getValueFromKey(ret, "POLICY_TYPE_NAME");
                 if (policyTypeName != null && !policyTypeName.equals("")) {

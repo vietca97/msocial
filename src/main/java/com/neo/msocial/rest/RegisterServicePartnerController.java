@@ -1,13 +1,11 @@
 package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
-import com.neo.msocial.groovy.CheckAccountPartner;
-import com.neo.msocial.groovy.CheckChongLoiDung;
-import com.neo.msocial.groovy.CheckSpam;
-import com.neo.msocial.groovy.DefUtils;
+import com.neo.msocial.groovy.*;
 import com.neo.msocial.request.RequestStep18;
 import com.neo.msocial.request.RequestStep20;
 import com.neo.msocial.request.RequestStep22;
+import com.neo.msocial.request.RequestStep6;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
@@ -26,14 +24,16 @@ public class RegisterServicePartnerController {
     private final RedisUtils context;
     private final CheckSpam checkSpam;
     private final CheckChongLoiDung checkChongLoiDung;
+    private final CheckStep6 checkStep6;
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung) {
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung, CheckStep6 checkStep6) {
 
         this.context = context;
         this.utilServices = utilServices;
         this.systemParameterServices = systemParameterServices;
         this.checkSpam = checkSpam;
         this.checkChongLoiDung = checkChongLoiDung;
+        this.checkStep6 = checkStep6;
     }
 
     @PostMapping("/step1")
@@ -68,6 +68,12 @@ public class RegisterServicePartnerController {
             }
             return ret;
         }
+    }
+
+    @PostMapping("/step6")
+    public boolean step6(@RequestBody RequestStep6 request
+    ) {
+        return checkStep6.getRetValue(request.getLstSoap35(), request.getLstSoap2());
     }
 
     @GetMapping("/step8")

@@ -1,9 +1,12 @@
 package com.neo.msocial.dto;
 
-public class Soap34DTO {
+public class Soap34 {
 
     private String MT_TYPE_KEY;
+    public static final String mtTypeKey = "MT_TYPE_KEY";
+
     private String MT_TYPE_VALUE;
+    public static final String mtTypeValue = "MT_TYPE_VALUE";
 
     public String getMT_TYPE_KEY() {
         return MT_TYPE_KEY;

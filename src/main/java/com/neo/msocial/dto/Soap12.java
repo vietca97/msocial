@@ -1,15 +1,22 @@
 package com.neo.msocial.dto;
 
-public class Step11DTO {
-    public String PARTNER_TYPE;
-    public String SEND_SMS;
-    public String PARTNER_NAME;
-    public String PARTNER_KEY;
+public class Soap12 {
+    private String PARTNER_TYPE;
+    public static final String partnerType = "PARTNER_TYPE";
 
-    public Step11DTO() {
+    private String SEND_SMS;
+    public static final String sendSms = "SEND_SMS";
+
+    private String PARTNER_NAME;
+    public static final String partnerName = "PARTNER_NAME";
+
+    private String PARTNER_KEY;
+    public static final String partnerKey = "PARTNER_KEY";
+
+    public Soap12() {
     }
 
-    public Step11DTO(String PARTNER_TYPE, String SEND_SMS, String PARTNER_NAME, String PARTNER_KEY) {
+    public Soap12(String PARTNER_TYPE, String SEND_SMS, String PARTNER_NAME, String PARTNER_KEY) {
         this.PARTNER_TYPE = PARTNER_TYPE;
         this.SEND_SMS = SEND_SMS;
         this.PARTNER_NAME = PARTNER_NAME;

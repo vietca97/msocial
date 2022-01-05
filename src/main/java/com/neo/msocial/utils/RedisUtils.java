@@ -17,9 +17,9 @@ public class RedisUtils {
     final  HashSet<String> sentinels = new HashSet<String>();
     public  JedisSentinelPool jedisPool = null;
 
-     String translog_database, translog_log_request;
-     String translog_update_request_status;
-     String translog_log_request_task;
+    String translog_database, translog_log_request;
+    String translog_update_request_status;
+    String translog_log_request_task;
 
     Gson gson = new Gson();
     public  JedisPoolConfig configPool = null;
@@ -111,7 +111,8 @@ public class RedisUtils {
 
             while (it1.hasNext()) {
                 String key = it1.next();
-                String value = jedis.get(key);
+                String value = jedis.get(key)
+                        ;
 	            /* Su dung cho Site HCM? Check lai co che cho nay, nen de o file cau hinh:
 	            if (value!=null) {
 		            value = value.replace("10.54.4.129", "10.54.73.47");
@@ -127,7 +128,8 @@ public class RedisUtils {
             Iterator<String> it2 = srcset.iterator();
             while (it2.hasNext()) {
                 String key = it2.next();
-                String cfg = jedis.get(key);
+                String cfg = jedis.get(key)
+                        ;
                 System.out.println(key + "="+ cfg);
                 Map<String, String> props = gson.fromJson(cfg, new TypeToken<Map<String, String>>() {
                 }.getType());

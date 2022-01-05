@@ -4,7 +4,7 @@ package com.neo.msocial.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Step8DTO {
+public class Soap15 {
 
     @JsonProperty(value = "SPAM_TEMPLATE_NAME")
     private String SPAM_TEMPLATE_NAME;

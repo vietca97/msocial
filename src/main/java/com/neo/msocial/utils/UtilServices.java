@@ -14,7 +14,6 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 @Component
 @PropertySource("classpath:app.properties")
@@ -149,64 +148,81 @@ public class UtilServices {
         return str.toString();
     }
 
-    String getValueFromKeySOAP12(List<Step11DTO> lst) {
+    String getValueFromKeySOAP12(List<Soap12> lst, String key) {
         String ret = "";
-        for (Step11DTO record : lst) {
-            if (record.getSEND_SMS() != null) {
-                ret = record.getSEND_SMS();
-                break;
+        for (Soap12 record : lst) {
+            switch (key){
+                case "SEND_SMS":
+                    if (record.getSEND_SMS() != null) {
+                        ret = record.getSEND_SMS();
+                        break;
+                    }
+            }
+
+        }
+        return ret;
+    }
+
+    String getValueFromKeySOAP14(List<Soap14> lst, String key) {
+        String ret = "";
+        for (Soap14 record : lst) {
+            switch (key){
+                case "REFUSEDTOTAL":
+                    if (record.getREFUSEDTOTAL() != null) {
+                        ret = record.getREFUSEDTOTAL();
+                        break;
+                    }
+            }
+
+        }
+        return ret;
+    }
+
+    String getValueFromKeySOAP16(List<Soap16> lst, String key) {
+        String ret = "";
+        for (Soap16 record : lst) {
+            switch (key) {
+                case "WAITREGISTERTOTAL":
+                    if (record.getWAITREGISTERTOTAL() != null) {
+                        ret = record.getWAITREGISTERTOTAL();
+                        break;
+                    }
             }
         }
         return ret;
     }
 
-    String getValueFromKeySOAP14(List<Soap14DTO> lst) {
+    String getValueFromKeySOAP17(List<Soap17> lst, String key) {
         String ret = "";
-        for (Soap14DTO record : lst) {
-            if (record.getREFUSEDTOTAL() != null) {
-                ret = record.getREFUSEDTOTAL();
-                break;
+        for (Soap17 record : lst) {
+            switch (key) {
+                case "WAITPERSERVICETOTAL":
+                    if (record.getWAITPERSERVICETOTAL() != null) {
+                        ret = record.getWAITPERSERVICETOTAL();
+                        break;
+                    }
             }
         }
         return ret;
     }
 
-    String getValueFromKeySOAP16(List<Soap16DTO> lst) {
+    String getValueFromKeySOAP19(List<Soap19> lst, String key) {
         String ret = "";
-        for (Soap16DTO record : lst) {
-            if (record.getWAITREGISTERTOTAL() != null) {
-                ret = record.getWAITREGISTERTOTAL();
-                break;
+        for (Soap19 record : lst) {
+            switch (key) {
+                case "REFUSEDPERSERVICETOTAL":
+                    if (record.getREFUSEDPERSERVICETOTAL() != null) {
+                        ret = record.getREFUSEDPERSERVICETOTAL();
+                        break;
+                    }
             }
         }
         return ret;
     }
 
-    String getValueFromKeySOAP17(List<Soap17DTO> lst) {
+    String getValueFromKeySOAP34(List<Soap34> lst, String key) {
         String ret = "";
-        for (Soap17DTO record : lst) {
-            if (record.getWAITPERSERVICETOTAL() != null) {
-                ret = record.getWAITPERSERVICETOTAL();
-                break;
-            }
-        }
-        return ret;
-    }
-
-    String getValueFromKeySOAP19(List<Soap19DTO> lst) {
-        String ret = "";
-        for (Soap19DTO record : lst) {
-            if (record.getREFUSEDPERSERVICETOTAL() != null) {
-                ret = record.getREFUSEDPERSERVICETOTAL();
-                break;
-            }
-        }
-        return ret;
-    }
-
-    String getValueFromKeySOAP34(List<Soap34DTO> lst, String key) {
-        String ret = "";
-        for (Soap34DTO record : lst) {
+        for (Soap34 record : lst) {
             if (record.getMT_TYPE_KEY().equals(key) ) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
@@ -215,9 +231,9 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP8(List<Step9DTO> lst, String key ) {
+    String getValueFromKeySOAP8(List<Soap8> lst, String key ) {
         String ret = "";
-        for (Step9DTO record : lst) {
+        for (Soap8 record : lst) {
             if (key.equals(record.getMT_TYPE_KEY())) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
@@ -226,9 +242,9 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP15(List<Step8DTO> lst, String key, String value) {
+    String getValueFromKeySOAP15(List<Soap15> lst, String key, String value) {
         String ret = "";
-        for (Step8DTO record : lst) {
+        for (Soap15 record : lst) {
             if (key.equals(record.getSPAM_TYPE_NAME())) {
                 switch (value) {
                     case "SPAM_TEMPLATE_VALUE":

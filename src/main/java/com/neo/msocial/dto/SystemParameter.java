@@ -1,8 +1,9 @@
 package com.neo.msocial.dto;
 
-public class Step2DTO {
+public class SystemParameter {
 
     private String SYSTEM_PARAMETER;
+    public  static final String systemParameter="SYSTEM_PARAMETER";
 
     public String getSYSTEM_PARAMETER() {
         return SYSTEM_PARAMETER;

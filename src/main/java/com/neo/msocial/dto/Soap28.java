@@ -1,28 +1,44 @@
 package com.neo.msocial.dto;
 
-public class Step13DTO {
+public class Soap28 {
     public String SCRIPT_TYPE_ID;
+    public static final String scriptTypeId = "SCRIPT_TYPE_ID";
     public String SERVICE_ID;
+    public static final String serviceId = "SERVICE_ID";
     public String PACKAGE_CODE_ID;
+    public static final String packageCodeId = "PACKAGE_CODE_ID";
     public String CHANNEL_ID;
+    public static final String channelId = "CHANNEL_ID";
     public String START_TIME;
+    public static final String startTime = "START_TIME";
     public String END_TIME;
+    public static final String endTime = "END_TIME";
     public String CHARGING_TYPE;
-    public String HAVE_MAINTAIN0;
+    public static final String chargingType = "CHARGING_TYPE";
+    public String HAVE_MAINTAIN;
+    public static final String haveMaintain = "HAVE_MAINTAIN";
     public String MAINTAIN_CYCLE;
+    public static final String maintainCycle = "MAINTAIN_CYCLE";
     public String MAINTAIN_DAYS;
+    public static final String maintainDays = "MAINTAIN_DAYS";
     public String REGISTERS_DAYS;
+    public static final String refusedtotal = "REFUSEDTOTAL";
     public String SEND_SMS_SHARING_KEY;
+    public static final String sendSmsSharingKey = "SEND_SMS_SHARING_KEY";
     public String SCRIPT_SHOP_STATUS;
+    public static final String scriptShopStatus = "SCRIPT_SHOP_STATUS";
     public String SCRIPT_SHOP_TYPE_KEY;
+    public static final String scriptShopTypeKey = "SCRIPT_SHOP_TYPE_KEY";
     public String SCRIPT_SHOP_TYPE_VALUE;
+    public static final String scriptShopTypeValue = "SCRIPT_SHOP_TYPE_VALUE";
     public String SO_NGAY_CHECKHUY;
+    public static final String soNgayCheckhuy = "SO_NGAY_CHECKHUY";
 
 
-    public Step13DTO() {
+    public Soap28() {
     }
 
-    public Step13DTO(String SCRIPT_TYPE_ID, String SERVICE_ID, String PACKAGE_CODE_ID, String CHANNEL_ID, String START_TIME, String END_TIME, String CHARGING_TYPE, String HAVE_MAINTAIN0, String MAINTAIN_CYCLE, String MAINTAIN_DAYS, String REGISTERS_DAYS, String SEND_SMS_SHARING_KEY, String SCRIPT_SHOP_STATUS, String SCRIPT_SHOP_TYPE_KEY, String SCRIPT_SHOP_TYPE_VALUE, String SO_NGAY_CHECKHUY) {
+    public Soap28(String SCRIPT_TYPE_ID, String SERVICE_ID, String PACKAGE_CODE_ID, String CHANNEL_ID, String START_TIME, String END_TIME, String CHARGING_TYPE, String HAVE_MAINTAIN, String MAINTAIN_CYCLE, String MAINTAIN_DAYS, String REGISTERS_DAYS, String SEND_SMS_SHARING_KEY, String SCRIPT_SHOP_STATUS, String SCRIPT_SHOP_TYPE_KEY, String SCRIPT_SHOP_TYPE_VALUE, String SO_NGAY_CHECKHUY) {
         this.SCRIPT_TYPE_ID = SCRIPT_TYPE_ID;
         this.SERVICE_ID = SERVICE_ID;
         this.PACKAGE_CODE_ID = PACKAGE_CODE_ID;
@@ -30,7 +46,7 @@ public class Step13DTO {
         this.START_TIME = START_TIME;
         this.END_TIME = END_TIME;
         this.CHARGING_TYPE = CHARGING_TYPE;
-        this.HAVE_MAINTAIN0 = HAVE_MAINTAIN0;
+        this.HAVE_MAINTAIN = HAVE_MAINTAIN;
         this.MAINTAIN_CYCLE = MAINTAIN_CYCLE;
         this.MAINTAIN_DAYS = MAINTAIN_DAYS;
         this.REGISTERS_DAYS = REGISTERS_DAYS;
@@ -98,11 +114,11 @@ public class Step13DTO {
     }
 
     public String getHAVE_MAINTAIN0() {
-        return HAVE_MAINTAIN0;
+        return HAVE_MAINTAIN;
     }
 
     public void setHAVE_MAINTAIN0(String HAVE_MAINTAIN0) {
-        this.HAVE_MAINTAIN0 = HAVE_MAINTAIN0;
+        this.HAVE_MAINTAIN = HAVE_MAINTAIN;
     }
 
     public String getMAINTAIN_CYCLE() {
@@ -179,7 +195,7 @@ public class Step13DTO {
                 ", START_TIME='" + START_TIME + '\'' +
                 ", END_TIME='" + END_TIME + '\'' +
                 ", CHARGING_TYPE='" + CHARGING_TYPE + '\'' +
-                ", HAVE_MAINTAIN0='" + HAVE_MAINTAIN0 + '\'' +
+                ", HAVE_MAINTAIN='" + HAVE_MAINTAIN + '\'' +
                 ", MAINTAIN_CYCLE='" + MAINTAIN_CYCLE + '\'' +
                 ", MAINTAIN_DAYS='" + MAINTAIN_DAYS + '\'' +
                 ", REGISTERS_DAYS='" + REGISTERS_DAYS + '\'' +

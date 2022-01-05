@@ -1,24 +1,20 @@
 package com.neo.msocial.groovy
 
-import com.neo.msocial.dto.ReponseSOAP35
-import com.neo.msocial.dto.Soap14DTO
-import com.neo.msocial.dto.Soap16DTO
-import com.neo.msocial.dto.Soap17DTO
-import com.neo.msocial.dto.Soap19DTO
-import com.neo.msocial.dto.Soap34DTO
-import com.neo.msocial.dto.Step11DTO
-import com.neo.msocial.dto.Step8DTO
-import com.neo.msocial.dto.Step9DTO
+
+import com.neo.msocial.dto.Soap14
+import com.neo.msocial.dto.Soap16
+import com.neo.msocial.dto.Soap17
+import com.neo.msocial.dto.Soap19
+import com.neo.msocial.dto.Soap34
+import com.neo.msocial.dto.Soap12
+import com.neo.msocial.dto.Soap15
+import com.neo.msocial.dto.Soap8
 import com.neo.msocial.service.Activation
-import com.neo.msocial.service.ParseXml
 import com.neo.msocial.utils.RedisUtils
 import com.neo.msocial.utils.UtilServices
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 
-import java.text.*;
-import java.util.*;
-
+import java.text.*
 
 class CheckSpam {
 
@@ -120,15 +116,14 @@ soap_17:trans_wait_per_service
 soap_19:trans_refused_per_service
 */
 
-    boolean checksendSms(List<Step9DTO> $soap_8_extract1,
-                         List<Step11DTO> $soap_12_extract1,
-                         List<Soap14DTO> $soap_14_extract1,
-                         List<Step8DTO> $soap_15_extract1,
-
-                         List<Soap16DTO> $soap_16_extract1,
-                         List<Soap17DTO> $soap_17_extract1,
-                         List<Soap19DTO> $soap_19_extract1,
-                         List<Soap34DTO> $soap_34_extract1,
+    boolean checksendSms(List<Soap8> $soap_8_extract1,
+                         List<Soap12> $soap_12_extract1,
+                         List<Soap14> $soap_14_extract1,
+                         List<Soap15> $soap_15_extract1,
+                         List<Soap16> $soap_16_extract1,
+                         List<Soap17> $soap_17_extract1,
+                         List<Soap19> $soap_19_extract1,
+                         List<Soap34> $soap_34_extract1,
 
                          String channel,
                          String sharing_key_id,
@@ -138,21 +133,21 @@ soap_19:trans_refused_per_service
         boolean sendSmsForSharing = false;
         String msisdn = $msisdn;
         String startTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        int noConfirm = Integer.parseInt(getValueFromKeySOAP16($soap_16_extract1, "waitregistertotal".toUpperCase()));
-        int no = Integer.parseInt(getValueFromKeySOAP14($soap_14_extract1, "refusedtotal".toUpperCase()));
+        int noConfirm = Integer.parseInt(utilServices.getValueFromKeySOAP16($soap_16_extract1, "waitregistertotal".toUpperCase()));
+        int no = Integer.parseInt(utilServices.getValueFromKeySOAP14($soap_14_extract1, "refusedtotal".toUpperCase()));
         int maxRefusedPerDay = 0;
         boolean stepResult = false;
         try {
             System.out.println("ccdcd:sdcdcccccccccccccccccc " + msisdn + ",noConfirm:" + noConfirm + ",no:" + no);
             //check co gui sms cho diem ban hay khong
             try {
-                String retval = utilServices.getValueFromKeySOAP12($soap_12_extract1);
+                String retval = utilServices.getValueFromKeySOAP12($soap_12_extract1, "SEND_SMS");
                 if (retval.equals("1")) sendSmsForSharing = true;
             } catch (Exception e) {
             }
 
             //check thue bao dang cho dich vu da gioi thieu cua diem ban
-            if (Integer.parseInt(getValueFromKeySOAP17($soap_17_extract1)) >= 1) {
+            if (Integer.parseInt(utilServices.getValueFromKeySOAP17($soap_17_extract1, "WAITPERSERVICETOTAL")) >= 1) {
                 if (sendSmsForSharing && context.get("channel").equals("SMS")) {
                     //String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
@@ -166,7 +161,7 @@ soap_19:trans_refused_per_service
             }
 
             //check thue bao da tu choi dich vu da gioi thieu cua diem ban
-            if (Integer.parseInt(getValueFromKey($soap_19_extract1)) >= 1) {
+            if (Integer.parseInt(utilServices.getValueFromKeySOAP19($soap_19_extract1, "REFUSEDPERSERVICETOTAL")) >= 1) {
                 if (sendSmsForSharing && context.get("channel").equals("SMS")) {
                     String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     if (mt == null || mt.equals(""))

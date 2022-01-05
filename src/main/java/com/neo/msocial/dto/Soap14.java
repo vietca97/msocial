@@ -1,6 +1,6 @@
 package com.neo.msocial.dto;
 
-public class Soap14DTO {
+public class Soap14 {
 
     private String REFUSEDTOTAL;
 

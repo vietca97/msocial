@@ -1,16 +1,25 @@
 package com.neo.msocial.dto;
 
-public class Step9DTO {
-    public String MT_TYPE_NAME;
-    public String MT_TYPE_DEFAULT;
-    public String MT_TYPE_KEY;
-    public String MT_TYPE_VALUE;
-    public String MT_TYPE_DESC;
+public class Soap8 {
+    private String MT_TYPE_NAME;
+    public  static final String mtTypeName="MT_TYPE_NAME";
 
-    public Step9DTO() {
+    private String MT_TYPE_DEFAULT;
+    public  static final String mtTypeDefault="MT_TYPE_DEFAULT";
+
+    private String MT_TYPE_KEY;
+    public  static final String mtTypeKey="MT_TYPE_KEY";
+
+    private String MT_TYPE_VALUE;
+    public  static final String mtTypeValue="MT_TYPE_VALUE";
+
+    private String MT_TYPE_DESC;
+    public  static final String mtTypeDesc="MT_TYPE_DESC";
+
+    public Soap8() {
     }
 
-    public Step9DTO(String MT_TYPE_NAME, String MT_TYPE_DEFAULT, String MT_TYPE_KEY, String MT_TYPE_VALUE, String MT_TYPE_DESC) {
+    public Soap8(String MT_TYPE_NAME, String MT_TYPE_DEFAULT, String MT_TYPE_KEY, String MT_TYPE_VALUE, String MT_TYPE_DESC) {
         this.MT_TYPE_NAME = MT_TYPE_NAME;
         this.MT_TYPE_DEFAULT = MT_TYPE_DEFAULT;
         this.MT_TYPE_KEY = MT_TYPE_KEY;

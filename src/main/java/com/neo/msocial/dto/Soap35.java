@@ -1,30 +1,27 @@
 package com.neo.msocial.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.Entity;
 
-public class SystemParameterDTO_Step2 {
+public class Soap35 {
+    private String JOB_EXP_DATA_DIR_EXP_LOCAL;
+    private String JOB_EXP_DATA_DIR_FTP;
+    private String LIST_EMAIL_REPORT_DUYTRI;
+    private String LIST_EMAIL_REPORT_JOB;
+    private String LIST_EMAIL_REPORT_PHATSINH;
+    private String LOCK_TIME;
+    private String LOGIN_MAX;
+    private String LOGSYSTEM;
+    private String ON_OFF_LOCK;
+    private String SERVER_FROM;
+    private String SERVER_PORT;
+    private String SERVER_HOST;
+    private String SERVER_PASS;
+    private String SERVER_USER;
 
-    String JOB_EXP_DATA_DIR_EXP_LOCAL;
-    String JOB_EXP_DATA_DIR_FTP;
-    String LIST_EMAIL_REPORT_DUYTRI;
-    String LIST_EMAIL_REPORT_JOB;
-    String LIST_EMAIL_REPORT_PHATSINH;
-    String LOCK_TIME;
-    String LOGIN_MAX;
-    String LOGSYSTEM;
-    String ON_OFF_LOCK;
-    String SERVER_FROM;
-    String SERVER_PORT;
-    String SERVER_HOST;
-    String SERVER_PASS;
-    String SERVER_USER;
-
-    public SystemParameterDTO_Step2() {
+    public Soap35() {
     }
 
-    public SystemParameterDTO_Step2(String JOB_EXP_DATA_DIR_EXP_LOCAL, String JOB_EXP_DATA_DIR_FTP, String LIST_EMAIL_REPORT_DUYTRI, String LIST_EMAIL_REPORT_JOB, String LIST_EMAIL_REPORT_PHATSINH, String LOCK_TIME, String LOGIN_MAX, String LOGSYSTEM, String ON_OFF_LOCK, String SERVER_FROM, String SERVER_HOST, String SERVER_PASS) {
+    public Soap35(String JOB_EXP_DATA_DIR_EXP_LOCAL, String JOB_EXP_DATA_DIR_FTP, String LIST_EMAIL_REPORT_DUYTRI, String LIST_EMAIL_REPORT_JOB, String LIST_EMAIL_REPORT_PHATSINH, String LOCK_TIME, String LOGIN_MAX, String LOGSYSTEM, String ON_OFF_LOCK, String SERVER_FROM, String SERVER_HOST, String SERVER_PASS) {
         this.JOB_EXP_DATA_DIR_EXP_LOCAL = JOB_EXP_DATA_DIR_EXP_LOCAL;
         this.JOB_EXP_DATA_DIR_FTP = JOB_EXP_DATA_DIR_FTP;
         this.LIST_EMAIL_REPORT_DUYTRI = LIST_EMAIL_REPORT_DUYTRI;

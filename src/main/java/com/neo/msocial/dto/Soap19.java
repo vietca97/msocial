@@ -1,8 +1,11 @@
 package com.neo.msocial.dto;
 
-public class Soap19DTO {
+import lombok.Data;
 
+
+public class Soap19 {
     private String REFUSEDPERSERVICETOTAL;
+    public static final String refusedperservicetotal = "REFUSEDPERSERVICETOTAL";
 
     public String getREFUSEDPERSERVICETOTAL() {
         return REFUSEDPERSERVICETOTAL;

@@ -6,59 +6,46 @@ import javax.persistence.Entity;
 
 public class Soap35 {
 
-    @JsonProperty("JOB_EXP_DATA_DIR_EXP_LOCAL")
+
     private String JOB_EXP_DATA_DIR_EXP_LOCAL;
     public static final String  jobExpDataDirExpLocal = "JOB_EXP_DATA_DIR_EXP_LOCAL";
 
-    @JsonProperty("JOB_EXP_DATA_DIR_FTP")
     private String JOB_EXP_DATA_DIR_FTP;
     public static final String  jobExpDataDirFtp = "JOB_EXP_DATA_DIR_FTP";
 
-    @JsonProperty("LIST_EMAIL_REPORT_DUYTRI")
     private String LIST_EMAIL_REPORT_DUYTRI;
     public static final String  listEmailReportDuytri = "LIST_EMAIL_REPORT_DUYTRI";
 
-    @JsonProperty("LIST_EMAIL_REPORT_JOB")
     private String LIST_EMAIL_REPORT_JOB;
     public static final String  listEmailReportJob = "LIST_EMAIL_REPORT_JOB";
 
-    @JsonProperty("LIST_EMAIL_REPORT_PHATSINH")
     private String LIST_EMAIL_REPORT_PHATSINH;
     public static final String  listEmailReportPhatsinh = "LIST_EMAIL_REPORT_PHATSINH";
 
-    @JsonProperty("LOCK_TIME")
     private String LOCK_TIME;
     public static final String  lockTime = "LOCK_TIME";
 
-    @JsonProperty("LOGIN_MAX")
     private String LOGIN_MAX;
     public static final String  loginMax = "LOGIN_MAX";
 
-    @JsonProperty("LOGSYSTEM")
     private String LOGSYSTEM;
     public static final String logSystem = "LOGSYSTEM";
 
-    @JsonProperty("ON_OFF_LOCK")
     private String ON_OFF_LOCK;
     public static final String onOffLock = "ON_OFF_LOCK";
 
-    @JsonProperty("SERVER_FROM")
     private String SERVER_FROM;
     public static final String serverFrom = "SERVER_FROM";
 
-    @JsonProperty("SERVER_PORT")
     private String SERVER_PORT;
     public static final String serverPort = "SERVER_PORT";
 
-    @JsonProperty("SERVER_HOST")
     private String SERVER_HOST;
     public static final String serverHost = "SERVER_HOST";
 
-    @JsonProperty("SERVER_PASS")
     private String SERVER_PASS;
     public static final String serverPass = "SERVER_PASS";
 
-    @JsonProperty("SERVER_USER")
     private String SERVER_USER;
     public static final String serverUser = "SERVER_USER";
 
@@ -80,22 +67,7 @@ public class Soap35 {
         this.SERVER_PASS = SERVER_PASS;
     }
 
-    public String getSERVER_USER() {
-        return SERVER_USER;
-    }
-
-    public void setSERVER_USER(String SERVER_USER) {
-        this.SERVER_USER = SERVER_USER;
-    }
-
-    public String getSERVER_PORT() {
-        return SERVER_PORT;
-    }
-
-    public void setSERVER_PORT(String SERVER_PORT) {
-        this.SERVER_PORT = SERVER_PORT;
-    }
-
+    @JsonProperty("JOB_EXP_DATA_DIR_EXP_LOCAL")
     public String getJOB_EXP_DATA_DIR_EXP_LOCAL() {
         return JOB_EXP_DATA_DIR_EXP_LOCAL;
     }
@@ -104,6 +76,7 @@ public class Soap35 {
         this.JOB_EXP_DATA_DIR_EXP_LOCAL = JOB_EXP_DATA_DIR_EXP_LOCAL;
     }
 
+    @JsonProperty("JOB_EXP_DATA_DIR_FTP")
     public String getJOB_EXP_DATA_DIR_FTP() {
         return JOB_EXP_DATA_DIR_FTP;
     }
@@ -112,6 +85,7 @@ public class Soap35 {
         this.JOB_EXP_DATA_DIR_FTP = JOB_EXP_DATA_DIR_FTP;
     }
 
+    @JsonProperty("LIST_EMAIL_REPORT_DUYTRI")
     public String getLIST_EMAIL_REPORT_DUYTRI() {
         return LIST_EMAIL_REPORT_DUYTRI;
     }
@@ -120,6 +94,7 @@ public class Soap35 {
         this.LIST_EMAIL_REPORT_DUYTRI = LIST_EMAIL_REPORT_DUYTRI;
     }
 
+    @JsonProperty("LIST_EMAIL_REPORT_JOB")
     public String getLIST_EMAIL_REPORT_JOB() {
         return LIST_EMAIL_REPORT_JOB;
     }
@@ -128,6 +103,7 @@ public class Soap35 {
         this.LIST_EMAIL_REPORT_JOB = LIST_EMAIL_REPORT_JOB;
     }
 
+    @JsonProperty("LIST_EMAIL_REPORT_PHATSINH")
     public String getLIST_EMAIL_REPORT_PHATSINH() {
         return LIST_EMAIL_REPORT_PHATSINH;
     }
@@ -136,6 +112,7 @@ public class Soap35 {
         this.LIST_EMAIL_REPORT_PHATSINH = LIST_EMAIL_REPORT_PHATSINH;
     }
 
+    @JsonProperty("LOCK_TIME")
     public String getLOCK_TIME() {
         return LOCK_TIME;
     }
@@ -144,6 +121,7 @@ public class Soap35 {
         this.LOCK_TIME = LOCK_TIME;
     }
 
+    @JsonProperty("LOGIN_MAX")
     public String getLOGIN_MAX() {
         return LOGIN_MAX;
     }
@@ -152,6 +130,7 @@ public class Soap35 {
         this.LOGIN_MAX = LOGIN_MAX;
     }
 
+    @JsonProperty("LOGSYSTEM")
     public String getLOGSYSTEM() {
         return LOGSYSTEM;
     }
@@ -160,6 +139,7 @@ public class Soap35 {
         this.LOGSYSTEM = LOGSYSTEM;
     }
 
+    @JsonProperty("ON_OFF_LOCK")
     public String getON_OFF_LOCK() {
         return ON_OFF_LOCK;
     }
@@ -168,6 +148,7 @@ public class Soap35 {
         this.ON_OFF_LOCK = ON_OFF_LOCK;
     }
 
+    @JsonProperty("SERVER_FROM")
     public String getSERVER_FROM() {
         return SERVER_FROM;
     }
@@ -176,6 +157,16 @@ public class Soap35 {
         this.SERVER_FROM = SERVER_FROM;
     }
 
+    @JsonProperty("SERVER_PORT")
+    public String getSERVER_PORT() {
+        return SERVER_PORT;
+    }
+
+    public void setSERVER_PORT(String SERVER_PORT) {
+        this.SERVER_PORT = SERVER_PORT;
+    }
+
+    @JsonProperty("SERVER_HOST")
     public String getSERVER_HOST() {
         return SERVER_HOST;
     }
@@ -184,6 +175,7 @@ public class Soap35 {
         this.SERVER_HOST = SERVER_HOST;
     }
 
+    @JsonProperty("SERVER_PASS")
     public String getSERVER_PASS() {
         return SERVER_PASS;
     }
@@ -192,24 +184,12 @@ public class Soap35 {
         this.SERVER_PASS = SERVER_PASS;
     }
 
+    @JsonProperty("SERVER_USER")
+    public String getSERVER_USER() {
+        return SERVER_USER;
+    }
 
-    @Override
-    public String toString() {
-        return "SystemParameterDTO{" +
-                "JOB_EXP_DATA_DIR_EXP_LOCAL='" + JOB_EXP_DATA_DIR_EXP_LOCAL + '\'' +
-                ", JOB_EXP_DATA_DIR_FTP='" + JOB_EXP_DATA_DIR_FTP + '\'' +
-                ", LIST_EMAIL_REPORT_DUYTRI='" + LIST_EMAIL_REPORT_DUYTRI + '\'' +
-                ", LIST_EMAIL_REPORT_JOB='" + LIST_EMAIL_REPORT_JOB + '\'' +
-                ", LIST_EMAIL_REPORT_PHATSINH='" + LIST_EMAIL_REPORT_PHATSINH + '\'' +
-                ", LOCK_TIME='" + LOCK_TIME + '\'' +
-                ", LOGIN_MAX='" + LOGIN_MAX + '\'' +
-                ", LOGSYSTEM='" + LOGSYSTEM + '\'' +
-                ", ON_OFF_LOCK='" + ON_OFF_LOCK + '\'' +
-                ", SERVER_FROM='" + SERVER_FROM + '\'' +
-                ", SERVER_PORT='" + SERVER_PORT + '\'' +
-                ", SERVER_HOST='" + SERVER_HOST + '\'' +
-                ", SERVER_PASS='" + SERVER_PASS + '\'' +
-                ", SERVER_USER='" + SERVER_USER + '\'' +
-                '}';
+    public void setSERVER_USER(String SERVER_USER) {
+        this.SERVER_USER = SERVER_USER;
     }
 }

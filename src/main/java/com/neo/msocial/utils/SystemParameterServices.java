@@ -43,46 +43,46 @@ public class SystemParameterServices {
         for (SystemParameter obj : lst) {
             switch (obj.getSYSTEM_PARAMETER().split(":")[0]) {
                 case Parameter.JOB_EXP_DATA_DIR_EXP_LOCAL:
-                    dto.setJOB_EXP_DATA_DIR_EXP_LOCAL(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setJOB_EXP_DATA_DIR_EXP_LOCAL(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.JOB_EXP_DATA_DIR_FTP:
-                    dto.setJOB_EXP_DATA_DIR_FTP(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setJOB_EXP_DATA_DIR_FTP(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_DUYTRI:
-                    dto.setLIST_EMAIL_REPORT_DUYTRI(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLIST_EMAIL_REPORT_DUYTRI(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_JOB:
-                    dto.setLIST_EMAIL_REPORT_JOB(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLIST_EMAIL_REPORT_JOB(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LIST_EMAIL_REPORT_PHATSINH:
-                    dto.setLIST_EMAIL_REPORT_PHATSINH(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLIST_EMAIL_REPORT_PHATSINH(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LOCK_TIME:
-                    dto.setLOCK_TIME(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLOCK_TIME(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LOGIN_MAX:
-                    dto.setLOGIN_MAX(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLOGIN_MAX(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.LOGSYSTEM:
-                    dto.setLOGSYSTEM(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setLOGSYSTEM(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.ON_OFF_LOCK:
-                    dto.setON_OFF_LOCK(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setON_OFF_LOCK(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.SERVER_FROM:
-                    dto.setSERVER_FROM(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setSERVER_FROM(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.SERVER_HOST:
-                    dto.setSERVER_HOST(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setSERVER_HOST(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.SERVER_PASS:
-                    dto.setSERVER_PASS(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setSERVER_PASS(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.SERVER_PORT:
-                    dto.setSERVER_PORT(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setSERVER_PORT(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
                 case Parameter.SERVER_USER:
-                    dto.setSERVER_USER(obj.getSYSTEM_PARAMETER().split(":")[0]);
+                    dto.setSERVER_USER(obj.getSYSTEM_PARAMETER().split(":")[1]);
                     break;
             }
         }

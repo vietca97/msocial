@@ -1,9 +1,18 @@
 package com.neo.msocial.groovy
 
 import com.neo.msocial.dto.ReponseSOAP35
+import com.neo.msocial.dto.Soap14DTO
+import com.neo.msocial.dto.Soap16DTO
+import com.neo.msocial.dto.Soap17DTO
+import com.neo.msocial.dto.Soap19DTO
+import com.neo.msocial.dto.Soap34DTO
+import com.neo.msocial.dto.Step11DTO
+import com.neo.msocial.dto.Step8DTO
+import com.neo.msocial.dto.Step9DTO
 import com.neo.msocial.service.Activation
 import com.neo.msocial.service.ParseXml
 import com.neo.msocial.utils.RedisUtils
+import com.neo.msocial.utils.UtilServices
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -18,6 +27,9 @@ class CheckSpam {
 
     @Autowired
     private RedisUtils context;
+
+    @Autowired
+    private UtilServices utilServices;
 
     def logSql = { String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId ->
         String request = """
@@ -62,7 +74,6 @@ class CheckSpam {
 
     def sendSms = { String receiver, String messageSms ->
         try {
-            receiver = String.valueOf(receiver);
             System.out.println(receiver + "|||" + messageSms);
             String serviceNumber = context.get("SERVICE_NUMBER");
             String smsHost = context.get("SMS_HOST");
@@ -96,38 +107,6 @@ class CheckSpam {
             return "-1|" + e.getMessage();
         }
     }
-    def getValueFromKey = { String body, String key ->
-        String ret = "";
-        try {
-            def rootNode = new XmlSlurper().parseText(body);
-            for (def record : rootNode.record.children()) {
-                if (record.name().equals(key)) {
-                    ret = record.text();
-                    break;
-                }
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            ret = "";
-        }
-        return ret;
-    }
-
-    String getValueFromKey (List<ReponseSOAP35> lst, String key ){
-        String ret = "";
-            for (ReponseSOAP35 record : lst) {
-                if (record.getKey() == key) {
-                    ret = record.getValue();
-                    break;
-                }
-            }
-        return ret;
-    }
-    def getValueFromKeyMultiRecords = { String body, String rootTag, String tagName, String key, String value ->
-        String ret = new ParseXml().getValueFromKey(body, rootTag, tagName, key, value);
-        return ret;
-    }
 //do bussiness
 /*
 soap_8: mt_info
@@ -141,14 +120,16 @@ soap_17:trans_wait_per_service
 soap_19:trans_refused_per_service
 */
 
-    Boolean checksendSms(String $soap_8_extract1,
-                         String $soap_12_extract1,
-                         String $soap_14_extract1,
-                         String $soap_15_extract1,
-                         String $soap_16_extract1,
-                         String $soap_17_extract1,
-                         String $soap_19_extract1,
-                         String $soap_34_extract1,
+    boolean checksendSms(List<Step9DTO> $soap_8_extract1,
+                         List<Step11DTO> $soap_12_extract1,
+                         List<Soap14DTO> $soap_14_extract1,
+                         List<Step8DTO> $soap_15_extract1,
+
+                         List<Soap16DTO> $soap_16_extract1,
+                         List<Soap17DTO> $soap_17_extract1,
+                         List<Soap19DTO> $soap_19_extract1,
+                         List<Soap34DTO> $soap_34_extract1,
+
                          String channel,
                          String sharing_key_id,
                          String $msisdn
@@ -157,25 +138,26 @@ soap_19:trans_refused_per_service
         boolean sendSmsForSharing = false;
         String msisdn = $msisdn;
         String startTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        int noConfirm = Integer.parseInt(getValueFromKey($soap_16_extract1, "waitregistertotal".toUpperCase()));
-        int no = Integer.parseInt(getValueFromKey($soap_14_extract1, "refusedtotal".toUpperCase()));
+        int noConfirm = Integer.parseInt(getValueFromKeySOAP16($soap_16_extract1, "waitregistertotal".toUpperCase()));
+        int no = Integer.parseInt(getValueFromKeySOAP14($soap_14_extract1, "refusedtotal".toUpperCase()));
         int maxRefusedPerDay = 0;
         boolean stepResult = false;
         try {
             System.out.println("ccdcd:sdcdcccccccccccccccccc " + msisdn + ",noConfirm:" + noConfirm + ",no:" + no);
             //check co gui sms cho diem ban hay khong
             try {
-                String retval = getValueFromKey($soap_12_extract1, "SEND_SMS");
+                String retval = utilServices.getValueFromKeySOAP12($soap_12_extract1);
                 if (retval.equals("1")) sendSmsForSharing = true;
             } catch (Exception e) {
             }
 
             //check thue bao dang cho dich vu da gioi thieu cua diem ban
-            if (Integer.parseInt(getValueFromKey($soap_17_extract1, "waitperservicetotal".toUpperCase())) >= 1) {
+            if (Integer.parseInt(getValueFromKeySOAP17($soap_17_extract1)) >= 1) {
                 if (sendSmsForSharing && context.get("channel").equals("SMS")) {
-                    String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                    //String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                    String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     if (mt == null || mt.equals(""))
-                        mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                        mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     String ret = sendSms(context.get("sharingkey"), mt);
                 }
                 context.put("ErrorCodeAPI", "40");
@@ -184,11 +166,11 @@ soap_19:trans_refused_per_service
             }
 
             //check thue bao da tu choi dich vu da gioi thieu cua diem ban
-            if (Integer.parseInt(getValueFromKey($soap_19_extract1, "refusedperservicetotal".toUpperCase())) >= 1) {
+            if (Integer.parseInt(getValueFromKey($soap_19_extract1)) >= 1) {
                 if (sendSmsForSharing && context.get("channel").equals("SMS")) {
-                    String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                    String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     if (mt == null || mt.equals(""))
-                        mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                        mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     String ret = sendSms(context.get("sharingkey"), mt);
                 }
                 context.put("ErrorCodeAPI", "41");
@@ -198,13 +180,13 @@ soap_19:trans_refused_per_service
 
 
             try {
-                maxRefusedPerDay = Integer.parseInt(getValueFromKeyMultiRecords($soap_15_extract1, "record", "SPAM_TYPE_NAME", "TRANS_REFUSED_PER_DAY", "SPAM_TEMPLATE_VALUE"));
+                maxRefusedPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1,"TRANS_REFUSED_PER_DAY","SPAM_TEMPLATE_VALUE"));
                 System.out.println("msisdn:" + msisdn + "," + maxRefusedPerDay);
             } catch (Exception e) {
             }
             int maxFaildPerDay = 0;
             try {
-                maxFaildPerDay = Integer.parseInt(getValueFromKeyMultiRecords($soap_15_extract1, "record", "SPAM_TYPE_NAME", "TRANS_FAILED_PER_DAY", "SPAM_TEMPLATE_VALUE"));
+                maxFaildPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1, "TRANS_FAILED_PER_DAY","SPAM_TEMPLATE_VALUE"));
                 System.out.println("msisdn:" + msisdn + "," + maxFaildPerDay);
             } catch (Exception e) {
                 maxFaildPerDay = 1000000;
@@ -212,7 +194,7 @@ soap_19:trans_refused_per_service
             if (no >= maxRefusedPerDay || noConfirm >= maxFaildPerDay || (no + noConfirm) >= maxFaildPerDay) {
                 System.out.println("msisdn:" + msisdn + ",maxRefusedPerDay:" + maxRefusedPerDay + ",no=" + no + ",maxFaildPerDay=" + maxFaildPerDay + ",noConfirm:" + noConfirm);
                 //do action
-                String actionType = getValueFromKeyMultiRecords($soap_15_extract1, "record", "SPAM_TYPE_NAME", "TRANS_FAILED_PER_DAY", "ACTION_TYPE");
+                String actionType = utilServices.getValueFromKeySOAP15($soap_15_extract1, "TRANS_FAILED_PER_DAY", "ACTION_TYPE");
                 if (actionType.equals("LOCK_DB")) {
                     String request = """
   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
@@ -235,14 +217,14 @@ soap_19:trans_refused_per_service
                     if (ret.equals("1")) {
                         if (sendSmsForSharing && context.get("channel").equals("SMS")) {
                             if (no >= maxRefusedPerDay) {
-                                String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "REFUSED_GIOITHIEU", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", no));
+                                String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "REFUSED_GIOITHIEU",).replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", no));
                                 if (mt == null || mt.equals(""))
-                                    mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "REFUSED_GIOITHIEU", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", no));
+                                    mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "REFUSED_GIOITHIEU").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", no));
                                 ret = sendSms(context.get("sharingkey"), mt);
                             } else if (noConfirm >= maxFaildPerDay || (no + noConfirm) >= maxFaildPerDay) {
-                                String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "LOCK_DIEM_BAN", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                                String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "LOCK_DIEM_BAN").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                                 if (mt == null || mt.equals(""))
-                                    mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "LOCK_DIEM_BAN", "MT_TYPE_VALUE").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                                    mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "LOCK_DIEM_BAN").replaceAll("\\{MSISDN}", String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
 
                                 ret = sendSms(context.get("sharingkey"), mt);
                             }
@@ -255,12 +237,12 @@ soap_19:trans_refused_per_service
                 if ((no + noConfirm) == (maxFaildPerDay - 1) || (no + noConfirm) == (maxRefusedPerDay - 1)) {
                     if (sendSmsForSharing && context.get("channel").equals("SMS")) {
                         if ((no + noConfirm) == (maxFaildPerDay - 1)) {
-                            String mt = getValueFromKeyMultiRecords($soap_34_extract1, "record", "MT_TYPE_KEY", "TRANSACTION_FAILED", "MT_TYPE_VALUE").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
+                            String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
                             if (mt == null || mt.equals(""))
-                                mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "TRANSACTION_FAILED", "MT_TYPE_VALUE").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
+                                mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
                             String ret = sendSms(context.get("sharingkey"), mt);
                         } else {
-                            String mt = getValueFromKeyMultiRecords($soap_8_extract1, "record", "MT_TYPE_KEY", "TRANSACTION_FAILED", "MT_TYPE_VALUE").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf((no + noConfirm)));
+                            String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf((no + noConfirm)));
                             String ret = sendSms(context.get("sharingkey"), mt);
                         }
                     }
@@ -268,39 +250,39 @@ soap_19:trans_refused_per_service
             }
             //check max sms per day
 
-            System.out.println("checking sms per day....");
-            boolean needCheck = false;
-            String info = getValueFromKeyMultiRecords($soap_15_extract1, "record", "SPAM_TYPE_NAME", "MAX_SMS", "ACTION_TYPE");
-            try {
-                int maxSms = Integer.parseInt(info);
-                String request = """
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-     <soapenv:Header/>
-     <soapenv:Body>
-        <vms:updateXml>
-           <!--Optional:-->
-           <vms:Service>total_sms</vms:Service>
-           <!--Optional:-->
-           <vms:Provider>default</vms:Provider>
-           <!--Optional:-->
-           <vms:ParamSize>1</vms:ParamSize>
-           <!--Optional:-->
-           <vms:P1>$channel</vms:P1>       
-        </vms:updateXml>
-     </soapenv:Body>
-  </soapenv:Envelope>
-  """;
-
-                String ret = activation.soapCall(context.get("dataflow_param:sqlmodule"), request);
-                if (Integer.parseInt(getValueFromKey(activation.parseXMLtext(ret, "//*[local-name() = 'return']"), "TOTAL_SMS")) >= maxSms) {
-                    context.put("ErrorCodeAPI", "21");
-                    context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh $channel");
-                    return false;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            stepResult = true;
+//            System.out.println("checking sms per day....");
+//            boolean needCheck = false;
+//            String info = utilServices.getValueFromKeySOAP15($soap_15_extract1, "MAX_SMS", "ACTION_TYPE");
+//            try {
+//                int maxSms = Integer.parseInt(info);
+//                String request = """
+//  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+//     <soapenv:Header/>
+//     <soapenv:Body>
+//        <vms:updateXml>
+//           <!--Optional:-->
+//           <vms:Service>total_sms</vms:Service>
+//           <!--Optional:-->
+//           <vms:Provider>default</vms:Provider>
+//           <!--Optional:-->
+//           <vms:ParamSize>1</vms:ParamSize>
+//           <!--Optional:-->
+//           <vms:P1>$channel</vms:P1>
+//        </vms:updateXml>
+//     </soapenv:Body>
+//  </soapenv:Envelope>
+//  """;
+//
+//                String ret = activation.soapCall(context.get("dataflow_param:sqlmodule"), request);
+//                if (Integer.parseInt(getValueFromKey(activation.parseXMLtext(ret, "//*[local-name() = 'return']"), "TOTAL_SMS")) >= maxSms) {
+//                    context.put("ErrorCodeAPI", "21");
+//                    context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh $channel");
+//                    return false;
+//                }
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//            }
+//            stepResult = true;
             //logSql(msisdn,"-1","CHECK_SPAM_POLICY","1","CHECK_SPAM_POLICY","script_shop_id=$script_shop_id|no="+no+",noConfirm="+noConfirm,String.valueOf(stepResult),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
             return true;
         } catch (Exception ex) {
@@ -311,5 +293,9 @@ soap_19:trans_refused_per_service
         String stepInput,String stepOutput,String stepAction,String startTime, String endTime,String inputParameter ->*/
         }
 
+    }
+
+    public String checkLockDb(){
+        return "";
     }
 }

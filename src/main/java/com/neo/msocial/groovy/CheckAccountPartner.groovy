@@ -6,7 +6,7 @@ import com.neo.msocial.utils.RedisUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-
+@Component
 class CheckAccountPartner {
 
     @Autowired

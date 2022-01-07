@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 import java.text.*;
 
 @Component
-class CheckChongLoiDung {
+class ChongLoiDung {
 
     @Autowired
     private RedisUtils context;
@@ -103,23 +103,6 @@ class CheckChongLoiDung {
             return "-1|" + e.getMessage();
         }
     }
-    def getValueFromKey = { String body, String key ->
-        String ret = "";
-        try {
-            def rootNode = new XmlSlurper().parseText(body);
-            for (def record : rootNode.record.children()) {
-                if (record.name().equals(key)) {
-                    ret = record.text();
-                    break;
-                }
-            }
-
-        } catch (Exception ex) {
-            //ex.printStackTrace();
-            ret = "";
-        }
-        return ret;
-    }
 
     String getValueLoiDung(List<PolicyDTO> lst, String key) {
         String ret = "";
@@ -141,12 +124,6 @@ class CheckChongLoiDung {
         return ret;
     }
 
-
-    def getValueFromKeyMultiRecords = { String body, String rootTag, String tagName, String key, String value ->
-        String ret = new ParseXml().getValueFromKey(body, rootTag, tagName, key, value);
-
-        return ret;
-    }
 //do bussiness
 /*
 soap_8: mt_info

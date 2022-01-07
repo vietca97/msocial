@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 import java.text.SimpleDateFormat
 
 @Component
-class CheckThueBaoSuDungDichVu {
+class ThuebaoSudungDichvu {
 
     @Autowired
     private RedisUtils context;

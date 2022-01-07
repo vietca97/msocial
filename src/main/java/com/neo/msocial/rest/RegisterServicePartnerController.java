@@ -3,80 +3,81 @@ package com.neo.msocial.rest;
 import com.neo.msocial.dto.*;
 import com.neo.msocial.groovy.*;
 import com.neo.msocial.request.*;
+import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
-import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceEditor;
-import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.ResourceRegionHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 @RestController
+@RequestMapping("/registerServicePartner")
 public class RegisterServicePartnerController {
 
     private final SystemParameterServices systemParameterServices;
     private final UtilServices utilServices;
     private final RedisUtils context;
-    private final CheckSpam checkSpam;
-    private final CheckChongLoiDung checkChongLoiDung;
+    private final Spam spam;
+    private final ChongLoiDung chongLoiDung;
     private final CheckStep6 checkStep6;
-    private final CheckThuebaoHuyDichVu checkThuebaoHuyDichVu;
-    private final CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu;
+    private final ThuebaoHuyDichVu thuebaoHuyDichVu;
+    private final ThuebaoSudungDichvu thuebaoSudungDichvu;
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung, CheckStep6 checkStep6, CheckThuebaoHuyDichVu checkThuebaoHuyDichVu, CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu) {
+    private final GenericsRequest<Soap28> request28;
+
+    private final GenericsRequest<Soap15> request15;
+
+    private final GenericsRequest<Soap37> request37;
+
+    private final GenericsRequest<Soap8> request8;
+
+    private final GenericsRequest<Soap16> request16;
+
+    private final GenericsRequest<Soap17> request17;
+
+    private final GenericsRequest<Soap19> request19;
+
+
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThuebaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
 
         this.context = context;
         this.utilServices = utilServices;
         this.systemParameterServices = systemParameterServices;
-        this.checkSpam = checkSpam;
-        this.checkChongLoiDung = checkChongLoiDung;
+        this.spam = spam;
+        this.chongLoiDung = chongLoiDung;
         this.checkStep6 = checkStep6;
-        this.checkThuebaoHuyDichVu = checkThuebaoHuyDichVu;
-        this.checkThueBaoSuDungDichVu = checkThueBaoSuDungDichVu;
+        this.thuebaoHuyDichVu = thuebaoHuyDichVu;
+        this.thuebaoSudungDichvu = thuebaoSudungDichvu;
+        this.request28 = request28;
+        this.request15 = request15;
+        this.request37 = request37;
+        this.request8 = request8;
+        this.request16 = request16;
+        this.request17 = request17;
+        this.request19 = request19;
     }
 
     @PostMapping("/step1")
-    public String step1(@RequestBody RegisterServicePartnerDTO dto) {
+    public String validateParameter(@RequestBody RegisterServicePartnerDTO dto) {
         return utilServices.callSoapVasGate(dto);
     }
 
     @GetMapping("/step2")
-    public List<Soap35> step2() {
+    public List<Soap35> getSystemParameter() {
         return systemParameterServices.getDataStep2();
     }
 
     @PostMapping("/step3")
-    public List<Soap37> step3(@RequestBody List<Soap35> lst
+    public List<Soap37> checkAccountPartnerInfo(@RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep3(lst);
+        return request37.getData(params);
     }
 
     @PostMapping("/step4")
-    public boolean step4(@RequestBody List<Soap37> soap37) {
+    public boolean checkAccountPartner(@RequestBody List<Soap37> soap37) {
         boolean ret = false;
         try {
             if (Integer.parseInt(soap37.get(0).getCHECK_ACCOUNT_API()) < 1) ret = false;
@@ -85,78 +86,84 @@ public class RegisterServicePartnerController {
             ex.printStackTrace();
             ret = false;
         } finally {
-            if(!ret){
-                context.put("ErrorCodeAPI","-2");
-                context.put("ErrorDescAPI","Username/Password khong dung");
+            if (!ret) {
+                context.put("ErrorCodeAPI", "-2");
+                context.put("ErrorDescAPI", "Username/Password khong dung");
             }
             return ret;
         }
     }
 
     @PostMapping("/step6")
-    public boolean step6(@RequestBody RequestStep6 request
+    public boolean checkAccountPartnerIsTrue(@RequestBody RequestStep6 request
     ) {
         return checkStep6.getRetValue(request.getLstSoap35(), request.getLstSoap2());
     }
 
     @GetMapping("/step8")
-    public List<Soap15> step8(
+    public List<Soap15> getSpamInfo(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep8();
+        return request15.getData(params);
+        //return systemParameterServices.getDataStep8();
     }
 
     @GetMapping("/step9")
-    public List<Soap8> step9(
+    public List<Soap8> getMTInformation(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep9();
+        return request8.getData(params);
     }
 
     @GetMapping("/step10")
-    public List<Soap9> step10(
+    public List<Soap9> getServicePackage(
     ) {
         return systemParameterServices.getDataStep10();
     }
 
     @GetMapping("/step11")
-    public List<Soap12> step11(
+    public List<Soap12> getPartnerType(
     ) {
         return systemParameterServices.getDataStep11();
     }
 
     @GetMapping("/step12")
-    public List<Soap14> step12(
+    public List<Soap14> transRefused(
     ) {
         return systemParameterServices.getDataStep12();
     }
 
     @GetMapping("/step13")
-    public List<Soap28> step13(
+    public List<Soap28> scriptShopInformation(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep13();
+        return request28.getData(params);
     }
 
     @GetMapping("/step14")
-    public List<Soap16> step14(
+    public List<Soap16> transWait(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep14();
+        return request16.getData(params);
     }
 
     @GetMapping("/step15")
-    public List<Soap17> step15(
+    public List<Soap17> transWaitPerService(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep15();
+        return request17.getData(params);
     }
 
     @GetMapping("/step16")
-    public List<Soap19> step16(
+    public List<Soap19> transRefusedPerService(@RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep16();
+        return request19.getData(params);
     }
 
     @PostMapping("/step18")
-    public void step18(
+    public void putData(
             @RequestBody RequestStep18 request
-            ) {
+    ) {
         for (Soap35 record : request.getLstSoap35()) {
             context.put(Soap35.jobExpDataDirExpLocal, record.getJOB_EXP_DATA_DIR_EXP_LOCAL());
             context.put(Soap35.jobExpDataDirFtp, record.getJOB_EXP_DATA_DIR_FTP());
@@ -234,7 +241,7 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step19")
-    public void step19(@RequestBody List<Soap34> lst) {
+    public void putData(@RequestBody List<Soap34> lst) {
         for (Soap34 record : lst) {
             context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
             context.put(Soap34.mtTypeValue, record.getMT_TYPE_VALUE());
@@ -242,8 +249,8 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step20")
-    public boolean step20(@RequestBody RequestStep20 request) {
-        return checkSpam.checksendSms(
+    public boolean checkSpam(@RequestBody RequestStep20 request) {
+        return spam.checksendSms(
                 request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap14(),
@@ -252,12 +259,12 @@ public class RegisterServicePartnerController {
                 request.getLstSoap17(),
                 request.getLstSoap19(),
                 request.getLstSoap34(),
-                request.getChannel(),request.getSharingKeyId(),request.getMsisdn());
+                request.getChannel(), request.getSharingKeyId(), request.getMsisdn());
     }
 
     @PostMapping("/step22")
-    public boolean step22(@RequestBody RequestStep22 request) {
-        return checkChongLoiDung.bussiness(request.getLstSoap8(),
+    public boolean checkChongLoiDung(@RequestBody RequestStep22 request) {
+        return chongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap34(),
                 request.getScript_shop_id(),
@@ -266,8 +273,8 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step25")
-    public boolean step25(@RequestBody RequestStep25 request) {
-        return checkThueBaoSuDungDichVu.checkThueBao(
+    public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
+        return thuebaoSudungDichvu.checkThueBao(
                 request.getLstSoap34(),
                 request.getLstSoap8(),
                 request.getScriptShopId(),
@@ -280,13 +287,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step28")
     public boolean step28() {
-        return checkThuebaoHuyDichVu.checkThueBaoHuy();
-    }
-
-
-    public static void main(String[] args) {
-        RedisUtils context = new RedisUtils();
-        System.out.println("---------"+ context.get("dataflow_param:utilmodule"));
+        return thuebaoHuyDichVu.checkThueBaoHuy();
     }
 
 }

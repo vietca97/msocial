@@ -9,7 +9,7 @@ import java.text.*;
 import java.util.*;
 
 @Component
-class CheckThuebaoHuyDichVu{
+class ThuebaoHuyDichVu {
     @Autowired
     private RedisUtils context;
 

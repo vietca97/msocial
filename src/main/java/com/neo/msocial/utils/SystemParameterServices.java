@@ -6,6 +6,7 @@ import com.neo.msocial.constant.Parameter;
 import com.neo.msocial.constant.RequestUrl;
 import com.neo.msocial.dto.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,7 +16,6 @@ import java.util.List;
 
 @Component
 public class SystemParameterServices {
-
 
     public List<Soap35> getDataStep2() {
         RestTemplate restTemplate = new RestTemplate();

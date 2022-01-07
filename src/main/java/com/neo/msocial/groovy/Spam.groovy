@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 import java.text.*
 
 @Component
-class CheckSpam {
+class Spam {
 
     @Autowired
     private Activation activation;

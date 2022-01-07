@@ -6,10 +6,32 @@ import com.neo.msocial.request.*;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
+import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceEditor;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.ResourceRegionHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -262,6 +284,9 @@ public class RegisterServicePartnerController {
     }
 
 
-
+    public static void main(String[] args) {
+        RedisUtils context = new RedisUtils();
+        System.out.println("---------"+ context.get("dataflow_param:utilmodule"));
+    }
 
 }

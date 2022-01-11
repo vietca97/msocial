@@ -48,3 +48,21 @@ pass: msocial2020
 1. cd /app/redis/redis-3.0.5/src
 2. ./redis-cli
 3. get dataflow_param:utilmodule
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <vms:valiDateRequest>
+         <!--Optional:-->
+         <vms:sharingkey>84784271676</vms:sharingkey>
+         <!--Optional:-->
+         <vms:serviceid>421</vms:serviceid>
+         <!--Optional:-->
+         <vms:packagecode>TRAICAY</vms:packagecode>
+         <!--Optional:-->
+         <vms:msisdn>0904570233</vms:msisdn>
+         <!--Optional:-->
+         <vms:channelkey>SMS</vms:channelkey>
+      </vms:valiDateRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

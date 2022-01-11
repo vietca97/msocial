@@ -1,6 +1,7 @@
 package com.neo.msocial.utils;
 
 import com.neo.msocial.dto.*;
+import com.neo.msocial.request.ValidateRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +45,7 @@ public class UtilServices {
             httpConn.setDoOutput(true);
             httpConn.setDoInput(true);
             OutputStream out = httpConn.getOutputStream();
-            out.write(xml.getBytes("utf8"));
+            out.write(xml.getBytes(StandardCharsets.UTF_8));
             out.flush();
             out.close();
             //Read the response:
@@ -258,5 +261,58 @@ public class UtilServices {
             }
         }
         return ret;
+    }
+
+    public String callSoapValidateRequest(ValidateRequest dto) {
+        StringBuilder str_soap = new StringBuilder();
+        str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+        str_soap.append("<soapenv:Header/><soapenv:Body>");
+        str_soap.append("<vms:valiDateRequest>");
+        str_soap.append("<vms:sharingkey>").append(dto.getSharingKey()).append("</vms:sharingkey>");
+        str_soap.append(" <vms:serviceid>").append(dto.getServiceId()).append("</vms:serviceid>");
+        str_soap.append("<vms:packagecode>").append(dto.getPackageCode()).append("</vms:packagecode>");
+        str_soap.append("<vms:msisdn>").append(dto.getMsisdn()).append("</vms:msisdn>");
+        str_soap.append("<vms:channelkey>").append(dto.getChannelKey()).append("</vms:channelkey>");
+        str_soap.append("</vms:valiDateRequest></soapenv:Body></soapenv:Envelope>");
+
+        try {
+            String resp = callSoapHttp(str_soap.toString(), urlSoap);
+            if (resp != null) {
+				/*
+				Document d = stringToDom(resp);
+				NodeList l = d.getElementsByTagName("ns:return");
+				String value = l.item(0).getTextContent();
+				*/
+                String value = getValueResult(resp);
+                //Sau do parser loai bo ky tu xml dac biet?
+                resp = parserXmlFormat(value);
+                // System.out.println(sdf.format(new java.util.Date()) + ":" + str_soap.toString() + ", res: " + resp);
+                return resp;
+            } else {
+                return "-1";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-1";
+        }
+    }
+
+    public List<Soap2> convertStringXmlToObject(ValidateRequest dto){
+        List<Soap2> lstSoap2 = new ArrayList<>();
+        String xml = callSoapValidateRequest(dto);
+        String[] results = xml.split("record>");
+        for(int i = 1 ; i < results.length - 1; i++){
+            Soap2 soap2 = new Soap2();
+            soap2.setPartnerId(results[i].substring(results[i].indexOf("partner_id>") + "partner_id>".length(),results[i].indexOf("/partner_id>")).split("&#38;lt")[0]);
+            soap2.setAgentId(results[i].substring(results[i].indexOf("agent_id>") + "agent_id>".length(),results[i].indexOf("/agent_id>")).split("&#38;lt")[0]);
+            soap2.setServiceId(results[i].substring(results[i].indexOf("service_id>") + "service_id>".length(),results[i].indexOf("/service_id>")).split("&#38;lt")[0]);
+            soap2.setTimeValidate(results[i].substring(results[i].indexOf("time_validate>") + "time_validate>".length(),results[i].indexOf("/time_validate>")).split("&#38;lt")[0]);
+            soap2.setMaChiNhanh(results[i].substring(results[i].indexOf("ma_chi_nhanh>") + "ma_chi_nhanh>".length(),results[i].indexOf("/ma_chi_nhanh>")).split("&#38;lt")[0]);
+            soap2.setScriptShopId(results[i].substring(results[i].indexOf("script_shop_id>") + "script_shop_id>".length(),results[i].indexOf("/script_shop_id>")).split("&#38;lt")[0]);
+            soap2.setSharingKeyId(results[i].substring(results[i].indexOf("sharing_key_id>") + "sharing_key_id>".length(),results[i].indexOf("/sharing_key_id>")).split("&#38;lt")[0]);
+            lstSoap2.add(soap2);
+        }
+
+        return lstSoap2;
     }
 }

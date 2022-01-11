@@ -259,15 +259,16 @@ public class RegisterServicePartnerController {
             context.put(Soap28.soNgayCheckhuy, record.getSO_NGAY_CHECKHUY());
             context.put(Soap28.startTime, record.getSTART_TIME());
         }
-        return "Put redis successful !!!";
+        return "Put redis successful step 18 !!!";
     }
 
     @PostMapping("/step19")
-    public void putData(@RequestBody List<Soap34> lst) {
-        for (Soap34 record : lst) {
+    public String  putData(@RequestBody RequestStep19 request) {
+        for (Soap34 record : request.getLstSoap34()) {
             context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
             context.put(Soap34.mtTypeValue, record.getMT_TYPE_VALUE());
         }
+        return "Put redis successful step 19 !!!";
     }
 
     @PostMapping("/step20")

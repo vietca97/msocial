@@ -30,6 +30,9 @@ public class Soap15 {
         this.SPAM_TEMPLATE_VALUE = SPAM_TEMPLATE_VALUE;
     }
 
+    public Soap15() {
+    }
+
     public String getSPAM_TEMPLATE_NAME() {
         return SPAM_TEMPLATE_NAME;
     }

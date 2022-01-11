@@ -8,6 +8,9 @@ public class Soap17 {
         this.WAITPERSERVICETOTAL = WAITPERSERVICETOTAL;
     }
 
+    public Soap17() {
+    }
+
     public String getWAITPERSERVICETOTAL() {
         return WAITPERSERVICETOTAL;
     }

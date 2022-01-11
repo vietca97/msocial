@@ -15,4 +15,6 @@ public class RequestStep19 {
     public void setLstSoap34(List<Soap34> lstSoap34) {
         this.lstSoap34 = lstSoap34;
     }
+
+
 }

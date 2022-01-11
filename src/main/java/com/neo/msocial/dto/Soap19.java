@@ -11,6 +11,9 @@ public class Soap19 {
         this.REFUSEDPERSERVICETOTAL = REFUSEDPERSERVICETOTAL;
     }
 
+    public Soap19() {
+    }
+
     public String getREFUSEDPERSERVICETOTAL() {
         return REFUSEDPERSERVICETOTAL;
     }

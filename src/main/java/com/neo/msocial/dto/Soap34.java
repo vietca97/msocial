@@ -1,5 +1,6 @@
 package com.neo.msocial.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Soap34 {
@@ -15,7 +16,12 @@ public class Soap34 {
         this.MT_TYPE_VALUE = MT_TYPE_VALUE;
     }
 
+    public Soap34() {
+
+    }
+
     @JsonProperty("MT_TYPE_KEY")
+    //@JsonFormat(shape= JsonFormat.Shape.STRING)
     public String getMT_TYPE_KEY() {
         return MT_TYPE_KEY;
     }
@@ -25,6 +31,7 @@ public class Soap34 {
     }
 
     @JsonProperty("MT_TYPE_VALUE")
+    //@JsonFormat(shape= JsonFormat.Shape.STRING)
     public String getMT_TYPE_VALUE() {
         return MT_TYPE_VALUE;
     }

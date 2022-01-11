@@ -8,6 +8,9 @@ public class Soap14 {
         this.REFUSEDTOTAL = REFUSEDTOTAL;
     }
 
+    public Soap14() {
+    }
+
     public String getREFUSEDTOTAL() {
         return REFUSEDTOTAL;
     }

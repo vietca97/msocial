@@ -1,21 +1,21 @@
-package com.neo.msocial.groovy
+package com.neo.msocial.groovy;
 
-import com.neo.msocial.dto.PolicyDTO
-import com.neo.msocial.dto.Soap12
-import com.neo.msocial.dto.Soap34
-import com.neo.msocial.dto.Soap8
-import com.neo.msocial.service.Activation
-import com.neo.msocial.service.ParseXml
-import com.neo.msocial.utils.RedisUtils
-import com.neo.msocial.utils.SystemParameterServices
-import com.neo.msocial.utils.UtilServices
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import com.neo.msocial.dto.PolicyDTO;
+import com.neo.msocial.dto.Soap12;
+import com.neo.msocial.dto.Soap34;
+import com.neo.msocial.dto.Soap8;
+import com.neo.msocial.service.Activation;
+import com.neo.msocial.service.ParseXml;
+import com.neo.msocial.utils.RedisUtils;
+import com.neo.msocial.utils.SystemParameterServices;
+import com.neo.msocial.utils.UtilServices;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.text.*;
 
 @Component
-class ChongLoiDung {
+public class ChongLoiDung {
 
     @Autowired
     private RedisUtils context;
@@ -26,7 +26,7 @@ class ChongLoiDung {
     @Autowired
     private SystemParameterServices services;
 
-    def logSql = { String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId ->
+    String logSql ( String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId ){
         String request = """
     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
        <soapenv:Header/>
@@ -68,7 +68,7 @@ class ChongLoiDung {
         String result = new Activation().soapCall(context.get("dataflow_param:sqlmodule"), request);
 
     }
-    def sendSms = { String receiver, String content ->
+    String sendSms (String receiver, String content){
         try {
             receiver = String.valueOf(receiver);
             String serviceNumber = context.get("SERVICE_NUMBER");
@@ -132,7 +132,7 @@ soap_9:service_package_info
 soap_12:partner_info
 */
 
-    boolean bussiness(
+   public boolean bussiness(
             List<Soap8> $soap_8_extract1,
             List<Soap12> $soap_12_extract1,
             List<Soap34> $soap_34_extract1,
@@ -179,7 +179,7 @@ soap_12:partner_info
             ret = new Activation().parseXMLtext(new Activation().soapCall(context.get("dataflow_param:sqlmodule"), request), "//*[local-name() = 'return']");
             System.out.println(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "|AAAAAAAAAAA:" + msisdn);
             String price = "0";
-            policyTypeName = "";
+            String policyTypeName = "";
             try {
                 try {
                    //getDataCheckPrice(String script_shop_id, String msisdn, String serviceid){
@@ -200,7 +200,9 @@ soap_12:partner_info
                             String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "THONG_BAO_PRICE_HIGHER").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY")).replaceAll("\\{PACKAGE_CODE}", context.get("PACKAGE_CODE")).replaceAll("\\{PACKAGE_PRICE}", context.get("PACKAGE_PRICE"));
                             if (mt == null || mt.equals(""))
                                 mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "THONG_BAO_PRICE_HIGHER",).replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY")).replaceAll("\\{PACKAGE_CODE}", context.get("PACKAGE_CODE")).replaceAll("\\{PACKAGE_PRICE}", context.get("PACKAGE_PRICE"));
-                            ret = sendSms(context.get("sharingkey"), mt);
+
+                            // fix data
+                            //ret = sendSms(context.get("sharingkey"), mt);
 
                         }
                         return false;

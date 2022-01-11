@@ -1,21 +1,28 @@
-package com.neo.msocial.groovy
+package com.neo.msocial.groovy;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.neo.msocial.constant.RequestUrl;
+import com.neo.msocial.dto.PolicyDTO;
+import com.neo.msocial.dto.SmsPerDayDTO;
+import com.neo.msocial.dto.Soap14;
+import com.neo.msocial.dto.Soap16;
+import com.neo.msocial.dto.Soap17;
+import com.neo.msocial.dto.Soap19;
+import com.neo.msocial.dto.Soap34;
+import com.neo.msocial.dto.Soap12;
+import com.neo.msocial.dto.Soap15;
+import com.neo.msocial.dto.Soap8;
+import com.neo.msocial.service.Activation;
+import com.neo.msocial.utils.GenericsRequest;
+import com.neo.msocial.utils.RedisUtils;
+import com.neo.msocial.utils.SystemParameterServices;
+import com.neo.msocial.utils.UtilServices;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-import com.neo.msocial.dto.Soap14
-import com.neo.msocial.dto.Soap16
-import com.neo.msocial.dto.Soap17
-import com.neo.msocial.dto.Soap19
-import com.neo.msocial.dto.Soap34
-import com.neo.msocial.dto.Soap12
-import com.neo.msocial.dto.Soap15
-import com.neo.msocial.dto.Soap8
-import com.neo.msocial.service.Activation
-import com.neo.msocial.utils.RedisUtils
-import com.neo.msocial.utils.SystemParameterServices
-import com.neo.msocial.utils.UtilServices
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
-
+import java.lang.reflect.Type
 import java.text.*
 
 @Component
@@ -32,6 +39,9 @@ class Spam {
 
     @Autowired
     private SystemParameterServices parameterServices;
+
+    @Autowired
+    private GenericsRequest<SmsPerDayDTO> smsPerDayDTOGenericsRequest;
 
     def logSql = { String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId ->
         String request = """
@@ -74,7 +84,7 @@ class Spam {
         String result = activation.soapCall(context.get("dataflow_param:sqlmodule"), request);
     }
 
-    def sendSms = { String receiver, String messageSms ->
+    def sendSms ( String receiver, String messageSms ){
         try {
             System.out.println(receiver + "|||" + messageSms);
             String serviceNumber = context.get("SERVICE_NUMBER");
@@ -82,28 +92,19 @@ class Spam {
             String smsPort = context.get("SMS_PORT");
             String smsLookup = context.get("SMS_LOOKUP");
             String utilUrl = context.get("dataflow_param:utilmodule");
-            String request = """
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-     <soapenv:Header/>
-     <soapenv:Body>
-        <vms:sendSms>
-           <!--Optional:-->
-           <vms:args0>$serviceNumber</vms:args0>
-           <!--Optional:-->
-           <vms:args1>$receiver</vms:args1>
-           <!--Optional:-->
-           <vms:args2>$messageSms</vms:args2>
-           <!--Optional:-->
-           <vms:args3>$smsHost</vms:args3>
-           <!--Optional:-->
-           <vms:args4>$smsPort</vms:args4>
-           <!--Optional:-->
-           <vms:args5>$smsLookup</vms:args5>
-        </vms:sendSms>
-     </soapenv:Body>
-  </soapenv:Envelope>
-  """
-            String result = activation.soapCall(utilUrl, request);
+
+            StringBuilder str_soap = new StringBuilder();
+            str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+            str_soap.append("<soapenv:Header/><soapenv:Body>");
+            str_soap.append("<vms:sendSms>");
+            str_soap.append("<vms:args0>").append(serviceNumber).append("</vms:args0>");
+            str_soap.append("<vms:args1>").append(receiver).append("</vms:args1>");
+            str_soap.append("<vms:args2>").append(messageSms).append("</vms:args2>");
+            str_soap.append("<vms:args3>").append(smsHost).append("</vms:args3>");
+            str_soap.append("<vms:args4>").append(smsPort).append("</vms:args4>");
+            str_soap.append("<vms:args5>").append(smsLookup).append("</vms:args5>");
+            str_soap.append("</vms:sendSms></soapenv:Body></soapenv:Envelope>");
+            String result = activation.soapCall(utilUrl, str_soap.toString());
             return result;
         } catch (Exception e) {
             return "-1|" + e.getMessage();
@@ -227,46 +228,56 @@ soap_19:trans_refused_per_service
                             String ret = sendSms(context.get("sharingkey"), mt);
                         } else {
                             String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf((no + noConfirm)));
-                            String ret = sendSms(context.get("sharingkey"), mt);
+                            //String ret = sendSms(context.get("sharingkey"), mt);
                         }
                     }
                 }
             }
             //check max sms per day
 
-//            System.out.println("checking sms per day....");
-//            boolean needCheck = false;
-//            String info = utilServices.getValueFromKeySOAP15($soap_15_extract1, "MAX_SMS", "ACTION_TYPE");
-//            try {
-//                int maxSms = Integer.parseInt(info);
-//                String request = """
-//  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-//     <soapenv:Header/>
-//     <soapenv:Body>
-//        <vms:updateXml>
-//           <!--Optional:-->
-//           <vms:Service>total_sms</vms:Service>
-//           <!--Optional:-->
-//           <vms:Provider>default</vms:Provider>
-//           <!--Optional:-->
-//           <vms:ParamSize>1</vms:ParamSize>
-//           <!--Optional:-->
-//           <vms:P1>$channel</vms:P1>
-//        </vms:updateXml>
-//     </soapenv:Body>
-//  </soapenv:Envelope>
-//  """;
-//
-//                String ret = activation.soapCall(context.get("dataflow_param:sqlmodule"), request);
-//                if (Integer.parseInt(getValueFromKey(activation.parseXMLtext(ret, "//*[local-name() = 'return']"), "TOTAL_SMS")) >= maxSms) {
-//                    context.put("ErrorCodeAPI", "21");
-//                    context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh $channel");
-//                    return false;
-//                }
-//            } catch (Exception e) {
-//                System.out.println(e.getMessage());
-//            }
-//            stepResult = true;
+            System.out.println("checking sms per day....");
+            boolean needCheck = false;
+            String info = utilServices.getValueFromKeySOAP15($soap_15_extract1, "MAX_SMS", "ACTION_TYPE");
+            try {
+                int maxSms = Integer.parseInt(info);
+             //   String request = """
+ // <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
+   //  <soapenv:Header/>
+    // <soapenv:Body>
+      //  <vms:updateXml>
+        // <!--Optional:-->
+        //   <vms:Service>total_sms</vms:Service>
+        //   <!--Optional:-->
+        //   <vms:Provider>default</vms:Provider>
+       //    <!--Optional:-->
+        //   <vms:ParamSize>1</vms:ParamSize>
+        //   <!--Optional:-->
+      //     <vms:P1>$channel</vms:P1>
+      //  </vms:updateXml>
+   //  </soapenv:Body>
+ // </soapenv:Envelope>
+ // """;
+                Map<String,String> params = new HashMap<>();
+                params.put("typeQuery","query");
+                params.put("Service","total_sms");
+                params.put("Provider","default");
+                params.put("ParamSize","1");
+                params.put("P1",channel);
+                List<SmsPerDayDTO> lstSmsPerDay = smsPerDayDTOGenericsRequest.getData(params);
+                if(lstSmsPerDay.get(0) != null && lstSmsPerDay.get(0).getTOTAL_SMS() != null){
+                    context.put("ErrorCodeAPI", "21");
+                    context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh " + channel);
+                    //return false;
+                }
+                //if (Integer.parseInt(getValueFromKey(activation.parseXMLtext(ret, "//*[local-name() = 'return']"), "TOTAL_SMS")) >= maxSms) {
+                //    context.put("ErrorCodeAPI", "21");
+               //     context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh $channel");
+                //    return false;
+               // }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            //stepResult = true;
             //logSql(msisdn,"-1","CHECK_SPAM_POLICY","1","CHECK_SPAM_POLICY","script_shop_id=$script_shop_id|no="+no+",noConfirm="+noConfirm,String.valueOf(stepResult),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel,dataflow:registerService",(String)$script_shop_id);
             return true;
         } catch (Exception ex) {

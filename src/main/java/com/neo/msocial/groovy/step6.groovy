@@ -15,35 +15,25 @@ class CheckStep6 {
 
     String sendSms (String receiver, String messageSms ){
         try {
-            receiver = String.valueOf(receiver);
-            System.out.println(receiver + "|||" + messageSms);
             String serviceNumber = context.get("SERVICE_NUMBER");
             String smsHost = context.get("SMS_HOST");
             String smsPort = context.get("SMS_PORT");
             String smsLookup = context.get("SMS_LOOKUP");
             String utilUrl = context.get("dataflow_param:utilmodule");
-            String request = """
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-     <soapenv:Header/>
-     <soapenv:Body>
-        <vms:sendSms>
-           <!--Optional:-->
-           <vms:args0>$serviceNumber</vms:args0>
-           <!--Optional:-->
-           <vms:args1>$receiver</vms:args1>
-           <!--Optional:-->
-           <vms:args2>$messageSms</vms:args2>
-           <!--Optional:-->
-           <vms:args3>$smsHost</vms:args3>
-           <!--Optional:-->
-           <vms:args4>$smsPort</vms:args4>
-           <!--Optional:-->
-           <vms:args5>$smsLookup</vms:args5>
-        </vms:sendSms>
-     </soapenv:Body>
-  </soapenv:Envelope>
-  """
-            String result = new Activation().soapCall(utilUrl, request);
+
+            StringBuilder str_soap = new StringBuilder();
+            str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+            str_soap.append("<soapenv:Header/><soapenv:Body>");
+            str_soap.append("<vms:sendSms>");
+            str_soap.append("<vms:args0>").append(serviceNumber).append("</vms:args0>");
+            str_soap.append("<vms:args1>").append(receiver).append("</vms:args1>");
+            str_soap.append("<vms:args2>").append(messageSms).append("</vms:args2>");
+            str_soap.append("<vms:args3>").append(smsHost).append("</vms:args3>");
+            str_soap.append("<vms:args4>").append(smsPort).append("</vms:args4>");
+            str_soap.append("<vms:args5>").append(smsLookup).append("</vms:args5>");
+            str_soap.append("</vms:sendSms></soapenv:Body></soapenv:Envelope>");
+
+            String result = new Activation().soapCall(utilUrl, str_soap.toString());
             return result;
         } catch (Exception e) {
             return "-1|" + e.getMessage();
@@ -156,10 +146,11 @@ class CheckStep6 {
                         mt = "Ma goi dich vu khong dung.";
                     else if (context.get("ErrorCodeAPI").equals("7"))
                         mt = "Diem ban hoac doi tac chua duoc cap quyen phan phoi dich vu.";
-                    sendSms(context.get("sharingkey"), mt);
+                    //sendSms(context.get("sharingkey"), mt);
                 }
             }
             return retval;
+
         }
         catch (
                 Exception ex

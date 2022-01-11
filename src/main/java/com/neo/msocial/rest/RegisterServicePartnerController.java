@@ -90,7 +90,7 @@ public class RegisterServicePartnerController {
                 context.put("ErrorCodeAPI", "-2");
                 context.put("ErrorDescAPI", "Username/Password khong dung");
             }
-            return ret;
+            return true;
         }
     }
 

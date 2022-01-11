@@ -182,7 +182,7 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step18")
-    public void putData(
+    public String putData(
             @RequestBody RequestStep18 request
     ) {
         for (Soap35 record : request.getLstSoap35()) {
@@ -259,6 +259,7 @@ public class RegisterServicePartnerController {
             context.put(Soap28.soNgayCheckhuy, record.getSO_NGAY_CHECKHUY());
             context.put(Soap28.startTime, record.getSTART_TIME());
         }
+        return "Put redis successful !!!";
     }
 
     @PostMapping("/step19")

@@ -306,10 +306,15 @@ public class UtilServices {
             soap2.setPartnerId(results[i].substring(results[i].indexOf("partner_id>") + "partner_id>".length(),results[i].indexOf("/partner_id>")).split("&#38;lt")[0]);
             soap2.setAgentId(results[i].substring(results[i].indexOf("agent_id>") + "agent_id>".length(),results[i].indexOf("/agent_id>")).split("&#38;lt")[0]);
             soap2.setServiceId(results[i].substring(results[i].indexOf("service_id>") + "service_id>".length(),results[i].indexOf("/service_id>")).split("&#38;lt")[0]);
-            soap2.setTimeValidate(results[i].substring(results[i].indexOf("time_validate>") + "time_validate>".length(),results[i].indexOf("/time_validate>")).split("&#38;lt")[0]);
+            //soap2.setTimeValidate(results[i].substring(results[i].indexOf("time_validate>") + "time_validate>".length(),results[i].indexOf("/time_validate>")).split("&#38;lt")[0]);
+            soap2.setTimeValidate("1");
             soap2.setMaChiNhanh(results[i].substring(results[i].indexOf("ma_chi_nhanh>") + "ma_chi_nhanh>".length(),results[i].indexOf("/ma_chi_nhanh>")).split("&#38;lt")[0]);
             soap2.setScriptShopId(results[i].substring(results[i].indexOf("script_shop_id>") + "script_shop_id>".length(),results[i].indexOf("/script_shop_id>")).split("&#38;lt")[0]);
             soap2.setSharingKeyId(results[i].substring(results[i].indexOf("sharing_key_id>") + "sharing_key_id>".length(),results[i].indexOf("/sharing_key_id>")).split("&#38;lt")[0]);
+            soap2.setChannelId(results[i].substring(results[i].indexOf("channel_id>") + "channel_id>".length(),results[i].indexOf("/channel_id>")).split("&#38;lt")[0]);
+            soap2.setPackageCodeId(results[i].substring(results[i].indexOf("packagecode_id>") + "packagecode_id>".length(),results[i].indexOf("/packagecode_id>")).split("&#38;lt")[0]);
+            soap2.setErrorCode("0");
+            soap2.setErrorDesc("success");
             lstSoap2.add(soap2);
         }
 

@@ -7,22 +7,31 @@ public class Soap2 {
     private String errorDesc;
 
     private String timeValidate;
+    public static final String time_validate = "time_validate";
 
     private String partnerId;
+    public static final String partner_id = "partner_id";
 
     private String agentId;
+    public static final String agent_id = "agent_id";
 
     private String serviceId;
+    public static final String service_id = "service_id";
 
     private String packageCodeId;
+    public static final String packagecode_id = "packagecode_id";
 
     private String channelId;
+    public static final String channel_id = "channel_id";
 
     private String maChiNhanh;
+    public static final String ma_chi_nhanh = "ma_chi_nhanh";
 
     private String scriptShopId;
+    public static final String script_shop_id = "script_shop_id";
 
     private String sharingKeyId;
+    public static final String sharing_key_id = "sharing_key_id";
 
     public String getErrorCode() {
         return errorCode;

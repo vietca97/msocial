@@ -151,7 +151,7 @@ public class UtilServices {
         return str.toString();
     }
 
-    String getValueFromKeySOAP12(List<Soap12> lst, String key) {
+    public String getValueFromKeySOAP12(List<Soap12> lst, String key) {
         String ret = "";
         for (Soap12 record : lst) {
             switch (key){
@@ -166,7 +166,7 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP14(List<Soap14> lst, String key) {
+    public String getValueFromKeySOAP14(List<Soap14> lst, String key) {
         String ret = "";
         for (Soap14 record : lst) {
             switch (key){
@@ -181,7 +181,7 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP16(List<Soap16> lst, String key) {
+    public String getValueFromKeySOAP16(List<Soap16> lst, String key) {
         String ret = "";
         for (Soap16 record : lst) {
             switch (key) {
@@ -195,7 +195,7 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP17(List<Soap17> lst, String key) {
+    public String getValueFromKeySOAP17(List<Soap17> lst, String key) {
         String ret = "";
         for (Soap17 record : lst) {
             switch (key) {
@@ -209,7 +209,7 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP19(List<Soap19> lst, String key) {
+    public String getValueFromKeySOAP19(List<Soap19> lst, String key) {
         String ret = "";
         for (Soap19 record : lst) {
             switch (key) {
@@ -223,10 +223,10 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP34(List<Soap34> lst, String key) {
+    public String getValueFromKeySOAP34(List<Soap34> lst, String key) {
         String ret = "";
         for (Soap34 record : lst) {
-            if (record.getMT_TYPE_KEY().equals(key) ) {
+            if (record.getMT_TYPE_KEY() != null ) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
             }
@@ -234,10 +234,10 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP8(List<Soap8> lst, String key ) {
+    public String getValueFromKeySOAP8(List<Soap8> lst, String key ) {
         String ret = "";
         for (Soap8 record : lst) {
-            if (key.equals(record.getMT_TYPE_KEY())) {
+            if (record.getMT_TYPE_KEY() != null) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
             }
@@ -245,7 +245,7 @@ public class UtilServices {
         return ret;
     }
 
-    String getValueFromKeySOAP15(List<Soap15> lst, String key, String value) {
+    public String getValueFromKeySOAP15(List<Soap15> lst, String key, String value) {
         String ret = "";
         for (Soap15 record : lst) {
             if (key.equals(record.getSPAM_TYPE_NAME())) {

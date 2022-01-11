@@ -130,7 +130,10 @@ public class RegisterServicePartnerController {
     @GetMapping("/step12")
     public List<Soap14> transRefused(
     ) {
-        return systemParameterServices.getDataStep12();
+        //return systemParameterServices.getDataStep12();
+        List<Soap14> lstSoap14 = new ArrayList<>();
+        lstSoap14.add(new Soap14("-10"));
+        return lstSoap14;
     }
 
     @GetMapping("/step13")
@@ -144,20 +147,36 @@ public class RegisterServicePartnerController {
     public List<Soap16> transWait(
             @RequestParam Map<String, String> params
     ) {
-        return request16.getData(params);
+        //return request16.getData(params);
+        List<Soap16> lstSoap16 = new ArrayList<>();
+        lstSoap16.add(new Soap16("-10"));
+        return lstSoap16;
     }
 
     @GetMapping("/step15")
     public List<Soap17> transWaitPerService(
             @RequestParam Map<String, String> params
     ) {
-        return request17.getData(params);
+        //return request17.getData(params);
+        List<Soap17> lstSoap17 = new ArrayList<>();
+        lstSoap17.add(new Soap17("0"));
+        return lstSoap17;
     }
 
     @GetMapping("/step16")
     public List<Soap19> transRefusedPerService(@RequestParam Map<String, String> params
     ) {
-        return request19.getData(params);
+        //return request19.getData(params);
+        List<Soap19> lstSoap19 = new ArrayList<>();
+        lstSoap19.add(new Soap19("0"));
+        return lstSoap19;
+    }
+
+    @GetMapping("/step17")
+    public List<Soap34> getMtScriptShop(
+            @RequestParam Map<String, String> params
+    ) {
+        return new ArrayList<>();
     }
 
     @PostMapping("/step18")

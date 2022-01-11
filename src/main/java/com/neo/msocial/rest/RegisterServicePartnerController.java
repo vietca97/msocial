@@ -176,7 +176,9 @@ public class RegisterServicePartnerController {
     public List<Soap34> getMtScriptShop(
             @RequestParam Map<String, String> params
     ) {
-        return new ArrayList<>();
+        List<Soap34> lstSoap34 = new ArrayList<>();
+        lstSoap34.add(new Soap34("TEST", "TEST"));
+        return lstSoap34;
     }
 
     @PostMapping("/step18")

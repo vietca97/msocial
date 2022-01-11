@@ -1,5 +1,6 @@
 package com.neo.msocial.service;
 
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -8,6 +9,7 @@ import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 
+@Component
 public class ParseXml {
 	public String getValueFromKey(String xmlString, String rootTag, String tagName, String key, String value){
 		String ret = "";

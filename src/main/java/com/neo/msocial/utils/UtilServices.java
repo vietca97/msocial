@@ -248,17 +248,16 @@ public class UtilServices {
     public String getValueFromKeySOAP15(List<Soap15> lst, String key, String value) {
         String ret = "";
         for (Soap15 record : lst) {
-            if (key.equals(record.getSPAM_TYPE_NAME())) {
                 switch (value) {
                     case "SPAM_TEMPLATE_VALUE":
                         ret = record.getSPAM_TEMPLATE_VALUE();
                         break;
                     case "ACTION_TYPE":
+
                         ret = record.getACTION_TYPE();
                         break;
                 }
 
-            }
         }
         return ret;
     }

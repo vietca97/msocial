@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.*;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ChongLoiDung {
@@ -27,77 +29,55 @@ public class ChongLoiDung {
     private SystemParameterServices services;
 
     String logSql ( String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId ){
-        String request = """
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-       <soapenv:Header/>
-       <soapenv:Body>
-          <vms:updateXml>
-             <!--Optional:-->
-             <vms:Service>sql_log_transaction_step</vms:Service>
-             <!--Optional:-->
-             <vms:Provider>default</vms:Provider>
-             <!--Optional:-->
-            <vms:ParamSize>12</vms:ParamSize>
-             <!--Optional:-->
-             <vms:P1>$transactionId</vms:P1>
-             <!--Optional:-->
-             <vms:P2>$stepName</vms:P2>
-             <!--Optional:-->
-             <vms:P3>$stepIndex</vms:P3>
-             <!--Optional:-->
-             <vms:P4>$stepKey</vms:P4>
-             <!--Optional:-->
-             <vms:P5>$stepInput</vms:P5>
-             <!--Optional:-->
-             <vms:P6>$stepOutput</vms:P6>
-             <!--Optional:-->
-             <vms:P7>$stepAction</vms:P7>
-             <!--Optional:-->
-             <vms:P8>$startTime</vms:P8>
-             <!--Optional:-->
-             <vms:P9>$endTime</vms:P9>
-             <!--Optional:-->
-             <vms:P10>$msisdn</vms:P10>
-             <!--Optional:-->
-             <vms:P11>$inputParameter</vms:P11>      
-             <vms:P12>$scriptShopId</vms:P12>   
-          </vms:updateXml>
-       </soapenv:Body>
-    </soapenv:Envelope>
-    """;
-        String result = new Activation().soapCall(context.get("dataflow_param:sqlmodule"), request);
+        StringBuilder str_soap = new StringBuilder();
+        str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+        str_soap.append("<soapenv:Header/><soapenv:Body>");
+        str_soap.append("<vms:updateXml>");
 
+        str_soap.append("<vms:Service>").append("sql_log_transaction_step").append("</vms:Service>");
+        str_soap.append("<vms:Provider>").append("default").append("</vms:Provider>");
+        str_soap.append("<vms:ParamSize>").append("12").append("</vms:ParamSize>");
+
+        str_soap.append("<vms:P1>").append(transactionId).append("</vms:P1>");
+        str_soap.append("<vms:P2>").append(stepName).append("</vms:P2>");
+        str_soap.append("<vms:P3>").append(stepIndex).append("</vms:P3>");
+        str_soap.append("<vms:P4>").append(stepKey).append("</vms:P4>");
+        str_soap.append("<vms:P5>").append(stepInput).append("</vms:P5>");
+        str_soap.append("<vms:P6>").append(stepOutput).append("</vms:P6>");
+        str_soap.append("<vms:P7>").append(stepAction).append("</vms:P7>");
+        str_soap.append("<vms:P8>").append(startTime).append("</vms:P8>");
+        str_soap.append("<vms:P9>").append(endTime).append("</vms:P9>");
+        str_soap.append("<vms:P10>").append(msisdn).append("</vms:P10>");
+        str_soap.append("<vms:P11>").append(inputParameter).append("</vms:P11>");
+        str_soap.append("<vms:P12>").append(scriptShopId).append("</vms:P12>");
+
+        str_soap.append("</vms:updateXml></soapenv:Body></soapenv:Envelope>");
+
+
+        String result = new Activation().soapCall(context.get("dataflow_param:sqlmodule"), str_soap.toString());
+        return result;
     }
-    String sendSms (String receiver, String content){
+    String sendSms ( String receiver, String messageSms ){
         try {
-            receiver = String.valueOf(receiver);
+            System.out.println(receiver + "|||" + messageSms);
             String serviceNumber = context.get("SERVICE_NUMBER");
             String smsHost = context.get("SMS_HOST");
             String smsPort = context.get("SMS_PORT");
             String smsLookup = context.get("SMS_LOOKUP");
             String utilUrl = context.get("dataflow_param:utilmodule");
-            String request = """
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <vms:sendSms>
-         <!--Optional:-->
-         <vms:args0>$serviceNumber</vms:args0>
-         <!--Optional:-->
-         <vms:args1>$receiver</vms:args1>
-         <!--Optional:-->
-         <vms:args2>$content</vms:args2>
-         <!--Optional:-->
-         <vms:args3>$smsHost</vms:args3>
-         <!--Optional:-->
-         <vms:args4>$smsPort</vms:args4>
-         <!--Optional:-->
-         <vms:args5>$smsLookup</vms:args5>
-      </vms:sendSms>
-   </soapenv:Body>
-</soapenv:Envelope>
-"""
-            String result = new Activation().soapCall(utilUrl, request);
+
+            StringBuilder str_soap = new StringBuilder();
+            str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+            str_soap.append("<soapenv:Header/><soapenv:Body>");
+            str_soap.append("<vms:sendSms>");
+            str_soap.append("<vms:args0>").append(serviceNumber).append("</vms:args0>");
+            str_soap.append("<vms:args1>").append(receiver).append("</vms:args1>");
+            str_soap.append("<vms:args2>").append(messageSms).append("</vms:args2>");
+            str_soap.append("<vms:args3>").append(smsHost).append("</vms:args3>");
+            str_soap.append("<vms:args4>").append(smsPort).append("</vms:args4>");
+            str_soap.append("<vms:args5>").append(smsLookup).append("</vms:args5>");
+            str_soap.append("</vms:sendSms></soapenv:Body></soapenv:Envelope>");
+            String result = new Activation().soapCall(utilUrl, str_soap.toString());
             return result;
         } catch (Exception e) {
             return "-1|" + e.getMessage();
@@ -176,7 +156,21 @@ soap_12:partner_info
             System.out.println(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "|AAAAAAAAAAA:" + msisdn);
             //check muc gia chung cho cac dich vu
 
-            ret = new Activation().parseXMLtext(new Activation().soapCall(context.get("dataflow_param:sqlmodule"), request), "//*[local-name() = 'return']");
+                StringBuilder str_soap = new StringBuilder();
+                str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+                str_soap.append("<soapenv:Header/><soapenv:Body>");
+                str_soap.append("<vms:queryXml>");
+
+                str_soap.append("<vms:Service>").append("checkLoiDungNotSendSms").append("</vms:Service>");
+                str_soap.append("<vms:Provider>").append("default").append("</vms:Provider>");
+                str_soap.append("<vms:ParamSize>").append("2").append("</vms:ParamSize>");
+
+                str_soap.append("<vms:P8>").append(script_shop_id).append("</vms:P8>");
+                str_soap.append("<vms:P10>").append(msisdn).append("</vms:P10>");
+
+                str_soap.append("</vms:queryXml></soapenv:Body></soapenv:Envelope>");
+                // fix data
+                //ret = new Activation().parseXMLtext(new Activation().soapCall(context.get("dataflow_param:sqlmodule"), str_soap.toString()), "//*[local-name() = 'return']");
             System.out.println(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "|AAAAAAAAAAA:" + msisdn);
             String price = "0";
             String policyTypeName = "";
@@ -184,8 +178,12 @@ soap_12:partner_info
                 try {
                    //getDataCheckPrice(String script_shop_id, String msisdn, String serviceid){
                     List<PolicyDTO> lstPolicy = services.getDataCheckPrice(script_shop_id, msisdn, serviceid);
-                    price = getValueLoiDung(lstPolicy, "PRICE");
-                    policyTypeName = getValueLoiDung(lstPolicy, "POLICY_TYPE_NAME");
+                    // fix data
+                    //price = getValueLoiDung(lstPolicy, "PRICE");
+                    //policyTypeName = getValueLoiDung(lstPolicy, "POLICY_TYPE_NAME");
+                    price = "price";
+                    policyTypeName = "policyTypeName";
+
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
                 }
@@ -199,7 +197,7 @@ soap_12:partner_info
                         if (sendSmsForSharing && context.get("channel").equals("SMS")) {
                             String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "THONG_BAO_PRICE_HIGHER").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY")).replaceAll("\\{PACKAGE_CODE}", context.get("PACKAGE_CODE")).replaceAll("\\{PACKAGE_PRICE}", context.get("PACKAGE_PRICE"));
                             if (mt == null || mt.equals(""))
-                                mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "THONG_BAO_PRICE_HIGHER",).replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY")).replaceAll("\\{PACKAGE_CODE}", context.get("PACKAGE_CODE")).replaceAll("\\{PACKAGE_PRICE}", context.get("PACKAGE_PRICE"));
+                                mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "THONG_BAO_PRICE_HIGHER").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY")).replaceAll("\\{PACKAGE_CODE}", context.get("PACKAGE_CODE")).replaceAll("\\{PACKAGE_PRICE}", context.get("PACKAGE_PRICE"));
 
                             // fix data
                             //ret = sendSms(context.get("sharingkey"), mt);

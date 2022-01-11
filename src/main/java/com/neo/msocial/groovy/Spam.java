@@ -51,9 +51,9 @@ public class Spam {
         str_soap.append("<soapenv:Header/><soapenv:Body>");
         str_soap.append("<vms:updateXml>");
 
-        str_soap.append("<vms:Service>").append("sql_log_transaction_step").append("</vms:P1>");
-        str_soap.append("<vms:Provider>").append("default").append("</vms:P1>");
-        str_soap.append("<vms:ParamSize>").append("12").append("</vms:P1>");
+        str_soap.append("<vms:Service>").append("sql_log_transaction_step").append("</vms:Service>");
+        str_soap.append("<vms:Provider>").append("default").append("</vms:Provider>");
+        str_soap.append("<vms:ParamSize>").append("11").append("</vms:ParamSize>");
 
         str_soap.append("<vms:P1>").append(transactionId).append("</vms:P1>");
         str_soap.append("<vms:P2>").append(stepName).append("</vms:P2>");
@@ -219,9 +219,11 @@ soap_19:trans_refused_per_service
                             String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
                             if (mt == null || mt.equals(""))
                                 mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
-                            String ret = sendSms(context.get("sharingkey"), mt);
+                            // fix data
+                            // String ret = sendSms(context.get("sharingkey"), mt);
                         } else {
                             String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf((no + noConfirm)));
+                            // fix data
                             //String ret = sendSms(context.get("sharingkey"), mt);
                         }
                     }
@@ -246,10 +248,10 @@ soap_19:trans_refused_per_service
                 List<SmsPerDayDTO> lstSmsPerDay = smsPerDayDTOGenericsRequest.getData(params);
                 // fix data
                 SmsPerDayDTO sms = new SmsPerDayDTO();
-                sms.setTOTAL_SMS("10");
+                sms.setTOTAL_SMS("-10");
                 lstSmsPerDay.add(sms);
 
-                if(lstSmsPerDay.get(0) != null && lstSmsPerDay.get(0).getTOTAL_SMS() != null){
+                if(lstSmsPerDay.get(0) != null && lstSmsPerDay.get(0).getTOTAL_SMS() != null && Integer.parseInt(lstSmsPerDay.get(0).getTOTAL_SMS()) >= maxSms){
                     context.put("ErrorCodeAPI", "21");
                     context.put("ErrorDescAPI", "Diem ban vuot qua gioi han " + maxSms + " gui tin qua kenh " + channel);
                     return false;

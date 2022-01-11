@@ -7,7 +7,6 @@ import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,7 +22,7 @@ public class RegisterServicePartnerController {
     private final Spam spam;
     private final ChongLoiDung chongLoiDung;
     private final CheckStep6 checkStep6;
-    private final ThuebaoHuyDichVu thuebaoHuyDichVu;
+    private final ThueBaoHuyDichVu thuebaoHuyDichVu;
     private final ThuebaoSudungDichvu thuebaoSudungDichvu;
 
     private final GenericsRequest<Soap28> request28;
@@ -41,7 +40,7 @@ public class RegisterServicePartnerController {
     private final GenericsRequest<Soap19> request19;
 
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThuebaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThueBaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
 
         this.context = context;
         this.utilServices = utilServices;
@@ -273,6 +272,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step20")
     public boolean checkSpam(@RequestBody RequestStep20 request) {
+        // true => NEXT
         return spam.checksendSms(
                 request.getLstSoap8(),
                 request.getLstSoap12(),
@@ -287,6 +287,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step22")
     public boolean checkChongLoiDung(@RequestBody RequestStep22 request) {
+        // true => NEXT
         return chongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap34(),
@@ -297,6 +298,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step25")
     public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
+        // true => NEXT
         return thuebaoSudungDichvu.checkThueBao(
                 request.getLstSoap34(),
                 request.getLstSoap8(),
@@ -309,8 +311,17 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step28")
-    public boolean step28() {
-        return thuebaoHuyDichVu.checkThueBaoHuy();
+    public boolean step28(@RequestBody RequestStep28 request) {
+        // false => NEXT
+        return thuebaoHuyDichVu.checkThueBaoHuy(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
     }
 
 }

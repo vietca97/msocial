@@ -73,8 +73,8 @@ class CheckStep6 {
         String ret = "";
         try {
             for (Soap2 record : lstSoap2) {
-                if (record.getTime_validate() != null) {
-                    ret = record.getTime_validate();
+                if (record.getTimeValidate() != null) {
+                    ret = record.getTimeValidate();
                     break;
                 }
             }

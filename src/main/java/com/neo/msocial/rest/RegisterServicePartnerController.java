@@ -63,8 +63,8 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step1")
-    public String validateParameter(@RequestBody RegisterServicePartnerDTO dto) {
-        return utilServices.callSoapVasGate(dto);
+    public List<Soap2> validateParameter(@RequestBody ValidateRequest dto) {
+        return utilServices.convertStringXmlToObject(dto);
     }
 
     @GetMapping("/step2")

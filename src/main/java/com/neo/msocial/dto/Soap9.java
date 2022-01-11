@@ -7,8 +7,8 @@ public class Soap9 {
     private String CHANGE_PACKAGE;
     public static final String changePackage = "CHANGE_PACKAGE";
 
-    private String HAVE_CHECK_HUY_WITH_5;
-    public static final String haveCheckHuyWith5 = "HAVE_CHECK_HUY_WITH_5";
+    private String HAVE_CHECK_HUY_WITH_5000;
+    public static final String haveCheckHuyWith5000 = "HAVE_CHECK_HUY_WITH_5000";
 
     private String NEED_CHECK_SERVICE;
     public static final String needCheckService = "NEED_CHECK_SERVICE";
@@ -76,10 +76,10 @@ public class Soap9 {
     public Soap9() {
     }
 
-    public Soap9(String HAVE_CHANGE_PACKAGE, String CHANGE_PACKAGE, String HAVE_CHECK_HUY_WITH_5, String NEED_CHECK_SERVICE, String HAVE_CHECK_HUY, String SERVICE_KEY_SMS, String SERVICE_ID, String SERVICE_NAME, String SERVICE_NAME_SMS, String SERVICE_KEY, String SERVICE_INFO, String HAVE_MAINTAIN, String PACKAGE_DYNAMIC, String PACKAGE_CODE, String PACKAGE_CODE_API, String CAPACITY, String PACKAGE_PRICE, String SPLIT_TIP, String PACKAGE_CODE_STATUS, String PACKAGE_CODE_ID, String PACKAGE_TYPE, String PACKAGE_CODE_SMS, String PACKAGE_CYCLE, String LIKE_MI_OR_VAS) {
+    public Soap9(String HAVE_CHANGE_PACKAGE, String CHANGE_PACKAGE, String HAVE_CHECK_HUY_WITH_5000, String NEED_CHECK_SERVICE, String HAVE_CHECK_HUY, String SERVICE_KEY_SMS, String SERVICE_ID, String SERVICE_NAME, String SERVICE_NAME_SMS, String SERVICE_KEY, String SERVICE_INFO, String HAVE_MAINTAIN, String PACKAGE_DYNAMIC, String PACKAGE_CODE, String PACKAGE_CODE_API, String CAPACITY, String PACKAGE_PRICE, String SPLIT_TIP, String PACKAGE_CODE_STATUS, String PACKAGE_CODE_ID, String PACKAGE_TYPE, String PACKAGE_CODE_SMS, String PACKAGE_CYCLE, String LIKE_MI_OR_VAS) {
         this.HAVE_CHANGE_PACKAGE = HAVE_CHANGE_PACKAGE;
         this.CHANGE_PACKAGE = CHANGE_PACKAGE;
-        this.HAVE_CHECK_HUY_WITH_5 = HAVE_CHECK_HUY_WITH_5;
+        this.HAVE_CHECK_HUY_WITH_5000 = HAVE_CHECK_HUY_WITH_5000;
         this.NEED_CHECK_SERVICE = NEED_CHECK_SERVICE;
         this.HAVE_CHECK_HUY = HAVE_CHECK_HUY;
         this.SERVICE_KEY_SMS = SERVICE_KEY_SMS;
@@ -119,12 +119,12 @@ public class Soap9 {
         this.CHANGE_PACKAGE = CHANGE_PACKAGE;
     }
 
-    public String getHAVE_CHECK_HUY_WITH_5() {
-        return HAVE_CHECK_HUY_WITH_5;
+    public String getHAVE_CHECK_HUY_WITH_5000() {
+        return HAVE_CHECK_HUY_WITH_5000;
     }
 
-    public void setHAVE_CHECK_HUY_WITH_5(String HAVE_CHECK_HUY_WITH_5) {
-        this.HAVE_CHECK_HUY_WITH_5 = HAVE_CHECK_HUY_WITH_5;
+    public void setHAVE_CHECK_HUY_WITH_5000(String HAVE_CHECK_HUY_WITH_5000) {
+        this.HAVE_CHECK_HUY_WITH_5000 = HAVE_CHECK_HUY_WITH_5000;
     }
 
     public String getNEED_CHECK_SERVICE() {
@@ -300,7 +300,7 @@ public class Soap9 {
         return "Step10DTO{" +
                 "HAVE_CHANGE_PACKAGE='" + HAVE_CHANGE_PACKAGE + '\'' +
                 ", CHANGE_PACKAGE='" + CHANGE_PACKAGE + '\'' +
-                ", HAVE_CHECK_HUY_WITH_5='" + HAVE_CHECK_HUY_WITH_5 + '\'' +
+                ", HAVE_CHECK_HUY_WITH_5='" + HAVE_CHECK_HUY_WITH_5000 + '\'' +
                 ", NEED_CHECK_SERVICE='" + NEED_CHECK_SERVICE + '\'' +
                 ", HAVE_CHECK_HUY='" + HAVE_CHECK_HUY + '\'' +
                 ", SERVICE_KEY_SMS='" + SERVICE_KEY_SMS + '\'' +

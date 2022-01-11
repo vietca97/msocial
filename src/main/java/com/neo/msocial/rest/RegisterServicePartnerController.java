@@ -210,7 +210,7 @@ public class RegisterServicePartnerController {
             context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
             context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5, record.getHAVE_CHECK_HUY_WITH_5());
+            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
             context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
             context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
             context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());

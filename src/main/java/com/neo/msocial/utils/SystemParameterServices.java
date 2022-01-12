@@ -17,8 +17,10 @@ import java.util.List;
 @Component
 public class SystemParameterServices {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     public List<Soap35> getDataStep2() {
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_2_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<SystemParameter>>() {
@@ -91,7 +93,6 @@ public class SystemParameterServices {
     }
 
     public List<Soap37> getDataStep3(List<Soap35> lst) {
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_3_URL + "&P1="+ lst.get(0).getSERVER_USER() + "&P2="+ lst.get(0).getSERVER_PASS(), String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap37>>() {}.getType();
@@ -100,7 +101,6 @@ public class SystemParameterServices {
     }
 
     public List<Soap15>  getDataStep8() {
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_8_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap15>>() {}.getType();
@@ -109,7 +109,6 @@ public class SystemParameterServices {
     }
 
     public List<Soap8> getDataStep9() {
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_9_URL, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         Type typeOfObjectsList = new TypeToken<ArrayList<Soap8>>() {}.getType();
@@ -118,7 +117,6 @@ public class SystemParameterServices {
     }
 
     public  List<Soap9> getDataStep10() {
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.StepUrl.STEP_10_URL, String.class);
         String result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
         Type typeOfObjectsList = new TypeToken<List<Soap9>>() {}.getType();
@@ -189,14 +187,12 @@ public class SystemParameterServices {
 
     public String getDataCheckLockDb(String sharingKeyId){
         //"return": 0
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.Check.LOCK_DB + "&P1=" + sharingKeyId, String.class);
         return response.split("\"return\":")[1];
     }
 
     public List<PolicyDTO> getDataCheckPolicy(String script_shop_id, String msisdn){
         //"return": 0
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.Check.POLICY + "&P1=" + script_shop_id + "&P2=" + msisdn, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
@@ -207,12 +203,23 @@ public class SystemParameterServices {
 
     public List<PolicyDTO> getDataCheckPrice(String script_shop_id, String msisdn, String serviceid){
         //"return": 0
-        RestTemplate restTemplate = new RestTemplate();
         String response = restTemplate.getForObject(RequestUrl.Check.PRICE + "&P1=" + script_shop_id + "&P2=" + msisdn + "&P3=" + serviceid, String.class);
         String result = response.substring(response.indexOf("["),response.indexOf("]")+1);
         String resultReplace= result.replace("\\","");;
         Type typeOfObjectsList = new TypeToken<List<PolicyDTO>>(){}.getType();
         List<PolicyDTO> objectsList = new Gson().fromJson(resultReplace, typeOfObjectsList);
         return objectsList;
+    }
+
+    public String executeLogSql(String ...params){
+        StringBuilder baseUrl = new StringBuilder("http://10.252.12.237:4122/services/SqlServices/update");
+        baseUrl.append("?Service=sql_log_transaction_step");
+        baseUrl.append("&Provider=default");
+        baseUrl.append("&ParamSize=" + params.length);
+        for (int i = 0 ; i < params.length ; i++){
+            baseUrl.append("&P" + (i + 1) ).append("=").append(params[i]);
+        }
+        String response = restTemplate.getForObject(baseUrl.toString(), String.class);
+        return response;
     }
 }

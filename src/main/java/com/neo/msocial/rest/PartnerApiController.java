@@ -8,6 +8,7 @@ import com.neo.msocial.groovy.ThuebaoSudungDichvu;
 import com.neo.msocial.request.RequestStep20;
 import com.neo.msocial.request.RequestStep22;
 import com.neo.msocial.request.RequestStep25;
+import com.neo.msocial.request.ValidateRequest;
 import com.neo.msocial.request.partnerapi.RequestStep16;
 import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
@@ -82,8 +83,8 @@ public class PartnerApiController {
     }
 
     @PostMapping("/step4")
-    public String validateParameter(@RequestBody RegisterServicePartnerDTO dto) {
-        return utilServices.callSoapVasGate(dto);
+    public List<Soap2> validateParameter(@RequestBody ValidateRequest dto) {
+        return utilServices.convertStringXmlToObject(dto);
     }
 
     @PostMapping("/step5")

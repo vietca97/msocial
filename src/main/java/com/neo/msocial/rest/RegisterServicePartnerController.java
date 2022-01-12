@@ -7,8 +7,6 @@ import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,7 +22,7 @@ public class RegisterServicePartnerController {
     private final Spam spam;
     private final ChongLoiDung chongLoiDung;
     private final CheckStep6 checkStep6;
-    private final ThuebaoHuyDichVu thuebaoHuyDichVu;
+    private final ThueBaoHuyDichVu thuebaoHuyDichVu;
     private final ThuebaoSudungDichvu thuebaoSudungDichvu;
 
 
@@ -43,7 +41,7 @@ public class RegisterServicePartnerController {
     private final GenericsRequest<Soap19> request19;
 
 
-    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThuebaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
+    public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThueBaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
 
         this.context = context;
         this.utilServices = utilServices;
@@ -92,7 +90,7 @@ public class RegisterServicePartnerController {
                 context.put("ErrorCodeAPI", "-2");
                 context.put("ErrorDescAPI", "Username/Password khong dung");
             }
-            return ret;
+            return true;
         }
     }
 
@@ -132,7 +130,10 @@ public class RegisterServicePartnerController {
     @GetMapping("/step12")
     public List<Soap14> transRefused(
     ) {
-        return systemParameterServices.getDataStep12();
+        //return systemParameterServices.getDataStep12();
+        List<Soap14> lstSoap14 = new ArrayList<>();
+        lstSoap14.add(new Soap14("-10"));
+        return lstSoap14;
     }
 
     @GetMapping("/step13")
@@ -146,24 +147,42 @@ public class RegisterServicePartnerController {
     public List<Soap16> transWait(
             @RequestParam Map<String, String> params
     ) {
-        return request16.getData(params);
+        //return request16.getData(params);
+        List<Soap16> lstSoap16 = new ArrayList<>();
+        lstSoap16.add(new Soap16("-10"));
+        return lstSoap16;
     }
 
     @GetMapping("/step15")
     public List<Soap17> transWaitPerService(
             @RequestParam Map<String, String> params
     ) {
-        return request17.getData(params);
+        //return request17.getData(params);
+        List<Soap17> lstSoap17 = new ArrayList<>();
+        lstSoap17.add(new Soap17("0"));
+        return lstSoap17;
     }
 
     @GetMapping("/step16")
     public List<Soap19> transRefusedPerService(@RequestParam Map<String, String> params
     ) {
-        return request19.getData(params);
+        //return request19.getData(params);
+        List<Soap19> lstSoap19 = new ArrayList<>();
+        lstSoap19.add(new Soap19("0"));
+        return lstSoap19;
+    }
+
+    @GetMapping("/step17")
+    public List<Soap34> getMtScriptShop(
+            @RequestParam Map<String, String> params
+    ) {
+        List<Soap34> lstSoap34 = new ArrayList<>();
+        lstSoap34.add(new Soap34("TEST", "TEST"));
+        return lstSoap34;
     }
 
     @PostMapping("/step18")
-    public void putData(
+    public String putData(
             @RequestBody RequestStep18 request
     ) {
         for (Soap35 record : request.getLstSoap35()) {
@@ -191,7 +210,7 @@ public class RegisterServicePartnerController {
             context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
             context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5, record.getHAVE_CHECK_HUY_WITH_5());
+            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
             context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
             context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
             context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
@@ -240,18 +259,21 @@ public class RegisterServicePartnerController {
             context.put(Soap28.soNgayCheckhuy, record.getSO_NGAY_CHECKHUY());
             context.put(Soap28.startTime, record.getSTART_TIME());
         }
+        return "Put redis successful step 18 !!!";
     }
 
     @PostMapping("/step19")
-    public void putData(@RequestBody List<Soap34> lst) {
-        for (Soap34 record : lst) {
+    public String  putData(@RequestBody RequestStep19 request) {
+        for (Soap34 record : request.getLstSoap34()) {
             context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
             context.put(Soap34.mtTypeValue, record.getMT_TYPE_VALUE());
         }
+        return "Put redis successful step 19 !!!";
     }
 
     @PostMapping("/step20")
     public boolean checkSpam(@RequestBody RequestStep20 request) {
+        // true => NEXT
         return spam.checksendSms(
                 request.getLstSoap8(),
                 request.getLstSoap12(),
@@ -266,6 +288,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step22")
     public boolean checkChongLoiDung(@RequestBody RequestStep22 request) {
+        // true => NEXT
         return chongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap34(),
@@ -276,6 +299,7 @@ public class RegisterServicePartnerController {
 
     @PostMapping("/step25")
     public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
+        // true => NEXT
         return thuebaoSudungDichvu.checkThueBao(
                 request.getLstSoap34(),
                 request.getLstSoap8(),
@@ -288,8 +312,17 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step28")
-    public boolean step28() {
-        return thuebaoHuyDichVu.checkThueBaoHuy();
+    public boolean step28(@RequestBody RequestStep28 request) {
+        // false => NEXT
+        return thuebaoHuyDichVu.checkThueBaoHuy(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
     }
 
 }

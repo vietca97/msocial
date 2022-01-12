@@ -26,6 +26,13 @@ public class Soap15 {
     private String ACTION_TYPE;
     public static final String actionType = "ACTION_TYPE";
 
+    public Soap15(String SPAM_TEMPLATE_VALUE) {
+        this.SPAM_TEMPLATE_VALUE = SPAM_TEMPLATE_VALUE;
+    }
+
+    public Soap15() {
+    }
+
     public String getSPAM_TEMPLATE_NAME() {
         return SPAM_TEMPLATE_NAME;
     }

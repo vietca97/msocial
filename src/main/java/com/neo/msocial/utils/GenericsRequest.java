@@ -53,7 +53,7 @@ public class GenericsRequest<T> {
         urlResponse.append(BASE_URL);
         urlResponse.append(params.containsKey("typeQuery") ? params.get("typeQuery") : null).append("/") // typeQuery
                 .append("?Service=").append(params.containsKey("Service") ? params.get("Service") : null) // service
-                .append("&Provider=").append(params.containsKey("Provider") ? params.get("Provider") : null) // provider
+                    .append("&Provider=").append(params.containsKey("Provider") ? params.get("Provider") : null) // provider
                 .append("&ParamSize=").append(params.containsKey("ParamSize") ? params.get("ParamSize") : null) // paramSize
                 .append("&response=").append(params.containsKey("response") ? params.get("response") : null); // Content type
         for (int i = 0; i < params.size(); i++) {

@@ -226,7 +226,7 @@ public class UtilServices {
     public String getValueFromKeySOAP34(List<Soap34> lst, String key) {
         String ret = "";
         for (Soap34 record : lst) {
-            if (record.getMT_TYPE_KEY() != null ) {
+            if (record.getMT_TYPE_KEY() != null && record.getMT_TYPE_KEY().equals(key)) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
             }
@@ -237,7 +237,7 @@ public class UtilServices {
     public String getValueFromKeySOAP8(List<Soap8> lst, String key ) {
         String ret = "";
         for (Soap8 record : lst) {
-            if (record.getMT_TYPE_KEY() != null) {
+            if (record.getMT_TYPE_KEY() != null && record.getMT_TYPE_KEY().equals(key)) {
                 ret = record.getMT_TYPE_VALUE();
                 break;
             }
@@ -250,12 +250,15 @@ public class UtilServices {
         for (Soap15 record : lst) {
                 switch (value) {
                     case "SPAM_TEMPLATE_VALUE":
-                        ret = record.getSPAM_TEMPLATE_VALUE();
-                        break;
+                        if(record.getSPAM_TYPE_NAME() != null && record.getSPAM_TYPE_NAME().equals(key)){
+                            ret = record.getSPAM_TEMPLATE_VALUE();
+                            break;
+                        }
                     case "ACTION_TYPE":
-
-                        ret = record.getACTION_TYPE();
-                        break;
+                        if(record.getSPAM_TYPE_NAME() != null && record.getSPAM_TYPE_NAME().equals(key)){
+                            ret = record.getACTION_TYPE();
+                            break;
+                        }
                 }
 
         }

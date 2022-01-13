@@ -7,6 +7,7 @@ import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.SystemParameterServices;
 import com.neo.msocial.utils.UtilServices;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -39,6 +40,15 @@ public class RegisterServicePartnerController {
     private final GenericsRequest<Soap17> request17;
 
     private final GenericsRequest<Soap19> request19;
+
+    @Autowired
+    private GenericsRequest<Soap9> request10;
+
+    @Autowired
+    private GenericsRequest<Soap12> request11;
+
+    @Autowired
+    private MiFc miFc;
 
 
     public RegisterServicePartnerController(UtilServices utilServices, RedisUtils context, SystemParameterServices systemParameterServices, Spam spam, ChongLoiDung chongLoiDung, CheckStep6 checkStep6, ThueBaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap28> request28, GenericsRequest<Soap15> request15, GenericsRequest<Soap37> request37, GenericsRequest<Soap8> request8, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
@@ -117,14 +127,16 @@ public class RegisterServicePartnerController {
 
     @GetMapping("/step10")
     public List<Soap9> getServicePackage(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep10();
+        return request10.getData(params);
     }
 
     @GetMapping("/step11")
     public List<Soap12> getPartnerType(
+            @RequestParam Map<String, String> params
     ) {
-        return systemParameterServices.getDataStep11();
+        return request11.getData(params);
     }
 
     @GetMapping("/step12")
@@ -203,35 +215,36 @@ public class RegisterServicePartnerController {
         }
 
         for (Soap9 record : request.getLstSoap9()) {
-            context.put(Soap9.serviceKey, record.getSERVICE_KEY());
-            context.put(Soap9.serviceKeySms, record.getSERVICE_KEY_SMS());
-            context.put(Soap9.capacity, record.getCAPACITY());
-            context.put(Soap9.changePackage, record.getCHANGE_PACKAGE());
-            context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
+            if (record != null) {
+                context.put(Soap9.serviceKey, record.getSERVICE_KEY());
+                context.put(Soap9.serviceKeySms, record.getSERVICE_KEY_SMS());
+                context.put(Soap9.capacity, record.getCAPACITY());
+                context.put(Soap9.changePackage, record.getCHANGE_PACKAGE());
+                context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
-            context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
-            context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
-            context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
-            context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
+                context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
+                context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
+                context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
+                context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
+                context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
 
-            context.put(Soap9.packageCode, record.getPACKAGE_CODE());
-            context.put(Soap9.packageCodeApi, record.getPACKAGE_CODE_API());
-            context.put(Soap9.packageCodeSms, record.getPACKAGE_CODE_SMS());
-            context.put(Soap9.packageCodeStatus, record.getPACKAGE_CODE_STATUS());
-            context.put(Soap9.packageCycle, record.getPACKAGE_CYCLE());
+                context.put(Soap9.packageCode, record.getPACKAGE_CODE());
+                context.put(Soap9.packageCodeApi, record.getPACKAGE_CODE_API());
+                context.put(Soap9.packageCodeSms, record.getPACKAGE_CODE_SMS());
+                context.put(Soap9.packageCodeStatus, record.getPACKAGE_CODE_STATUS());
+                context.put(Soap9.packageCycle, record.getPACKAGE_CYCLE());
 
-            context.put(Soap9.packageDynamic, record.getPACKAGE_DYNAMIC());
-            context.put(Soap9.packagePrice, record.getPACKAGE_PRICE());
-            context.put(Soap9.packageType, record.getPACKAGE_TYPE());
-            context.put(Soap9.serviceId, record.getSERVICE_ID());
-            context.put(Soap9.serviceInfo, record.getSERVICE_INFO());
+                context.put(Soap9.packageDynamic, record.getPACKAGE_DYNAMIC());
+                context.put(Soap9.packagePrice, record.getPACKAGE_PRICE());
+                context.put(Soap9.packageType, record.getPACKAGE_TYPE());
+                context.put(Soap9.serviceId, record.getSERVICE_ID());
+                context.put(Soap9.serviceInfo, record.getSERVICE_INFO());
 
-            context.put(Soap9.serviceName, record.getSERVICE_NAME());
-            context.put(Soap9.serviceNameSms, record.getSERVICE_NAME_SMS());
-            context.put(Soap9.splitTip, record.getSPLIT_TIP());
+                context.put(Soap9.serviceName, record.getSERVICE_NAME());
+                context.put(Soap9.serviceNameSms, record.getSERVICE_NAME_SMS());
+                context.put(Soap9.splitTip, record.getSPLIT_TIP());
+            }
         }
-
         for (Soap12 record : request.getLstSoap12()) {
             context.put(Soap12.partnerKey, record.getPARTNER_KEY());
             context.put(Soap12.partnerName, record.getPARTNER_NAME());
@@ -311,6 +324,15 @@ public class RegisterServicePartnerController {
         );
     }
 
+    @PostMapping("/step26")
+    public boolean resultThuebaoUseService(@RequestBody RequestStep26 request) {
+        // ket qua cua step 25
+        System.out.println("checkUsedService:"+request.isCheckUsedService());
+        return request.isCheckUsedService();
+    }
+
+    // step27 -> end
+
     @PostMapping("/step28")
     public boolean step28(@RequestBody RequestStep28 request) {
         // false => NEXT
@@ -324,5 +346,52 @@ public class RegisterServicePartnerController {
                 request.getChannel()
         );
     }
+
+    @PostMapping("/step29")
+    public boolean step29(@RequestBody RequestStep29 request) {
+        // ket qua cua step 28
+        System.out.println("----:"+ request.isCheckHuyStatus());
+        System.out.println("----:SERVICE"+ context.get("SERVICE_KEY"));
+        if("MOBILEINTERNET".equals(context.get("SERVICE_KEY")) || "FASTCONNECT".equals(context.get("SERVICE_KEY")) ) return true;
+        else
+        {
+            System.out.println("----DAILV:"+ request.isCheckHuyStatus());
+            return request.isCheckHuyStatus();
+        }
+    }
+    // step30 -> end
+
+    @PostMapping("/step31")
+    public boolean checkMiFc(@RequestBody RequestStep31 request) {
+        // true => NEXT
+        return miFc.checkMifc(
+                request.getLstSoap8(),
+                request.getLstSoap34(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getServiceId(),
+                request.getPackageCode(),
+                request.getChannel(),
+                request.getScriptShopId(),
+                request.getCheckStartDate()
+        );
+    }
+
+    @PostMapping("/step32")
+    public boolean checkStep(@RequestBody RequestStep32 request) {
+        // ket qua cua step 31
+        System.out.println("DOI GOI pass");
+        return request.isCheckMiFcStatus();
+    }
+    // step33 -> end
+
+    @PostMapping("/step34")
+    public String registerService() {
+        // Chua co file gateway_32.txt
+        return "gateway_32.txt";
+
+    }
+    // step35 -> end
+    // step36 -> end
 
 }

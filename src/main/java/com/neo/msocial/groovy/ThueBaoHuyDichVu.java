@@ -109,7 +109,7 @@ soap_12:partner_info
                 // fix data
                 //if (context.get("SERVICE_KEY").equals("NHAC_CHO_FUNRING") || context.get("SERVICE_KEY").equals("ZING_TANG_NHACCHO") || context.get("isservice").equals("true") || context.get("HAVE_CHECK_HUY").equals("0"))
                    // stepResult = true;
-                if("2".equals("1")){}
+                if("1".equals("1")){}
                 else {
 
                     StringBuilder str_soap = new StringBuilder();

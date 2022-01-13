@@ -214,35 +214,36 @@ public class RegisterServicePartnerController {
         }
 
         for (Soap9 record : request.getLstSoap9()) {
-            context.put(Soap9.serviceKey, record.getSERVICE_KEY());
-            context.put(Soap9.serviceKeySms, record.getSERVICE_KEY_SMS());
-            context.put(Soap9.capacity, record.getCAPACITY());
-            context.put(Soap9.changePackage, record.getCHANGE_PACKAGE());
-            context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
+            if (record != null) {
+                context.put(Soap9.serviceKey, record.getSERVICE_KEY());
+                context.put(Soap9.serviceKeySms, record.getSERVICE_KEY_SMS());
+                context.put(Soap9.capacity, record.getCAPACITY());
+                context.put(Soap9.changePackage, record.getCHANGE_PACKAGE());
+                context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
-            context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
-            context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
-            context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
-            context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
+                context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
+                context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
+                context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
+                context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
+                context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
 
-            context.put(Soap9.packageCode, record.getPACKAGE_CODE());
-            context.put(Soap9.packageCodeApi, record.getPACKAGE_CODE_API());
-            context.put(Soap9.packageCodeSms, record.getPACKAGE_CODE_SMS());
-            context.put(Soap9.packageCodeStatus, record.getPACKAGE_CODE_STATUS());
-            context.put(Soap9.packageCycle, record.getPACKAGE_CYCLE());
+                context.put(Soap9.packageCode, record.getPACKAGE_CODE());
+                context.put(Soap9.packageCodeApi, record.getPACKAGE_CODE_API());
+                context.put(Soap9.packageCodeSms, record.getPACKAGE_CODE_SMS());
+                context.put(Soap9.packageCodeStatus, record.getPACKAGE_CODE_STATUS());
+                context.put(Soap9.packageCycle, record.getPACKAGE_CYCLE());
 
-            context.put(Soap9.packageDynamic, record.getPACKAGE_DYNAMIC());
-            context.put(Soap9.packagePrice, record.getPACKAGE_PRICE());
-            context.put(Soap9.packageType, record.getPACKAGE_TYPE());
-            context.put(Soap9.serviceId, record.getSERVICE_ID());
-            context.put(Soap9.serviceInfo, record.getSERVICE_INFO());
+                context.put(Soap9.packageDynamic, record.getPACKAGE_DYNAMIC());
+                context.put(Soap9.packagePrice, record.getPACKAGE_PRICE());
+                context.put(Soap9.packageType, record.getPACKAGE_TYPE());
+                context.put(Soap9.serviceId, record.getSERVICE_ID());
+                context.put(Soap9.serviceInfo, record.getSERVICE_INFO());
 
-            context.put(Soap9.serviceName, record.getSERVICE_NAME());
-            context.put(Soap9.serviceNameSms, record.getSERVICE_NAME_SMS());
-            context.put(Soap9.splitTip, record.getSPLIT_TIP());
+                context.put(Soap9.serviceName, record.getSERVICE_NAME());
+                context.put(Soap9.serviceNameSms, record.getSERVICE_NAME_SMS());
+                context.put(Soap9.splitTip, record.getSPLIT_TIP());
+            }
         }
-
         for (Soap12 record : request.getLstSoap12()) {
             context.put(Soap12.partnerKey, record.getPARTNER_KEY());
             context.put(Soap12.partnerName, record.getPARTNER_NAME());

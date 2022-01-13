@@ -2,6 +2,7 @@ package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
 import com.neo.msocial.groovy.sendunicastdf.CheckStep2;
+import com.neo.msocial.request.RequestStep25;
 import com.neo.msocial.request.ValidateRequest;
 import com.neo.msocial.request.partnerapi.RequestStep16;
 import com.neo.msocial.utils.GenericsRequest;
@@ -144,7 +145,7 @@ public class SendUnicastDFController {
             context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
             context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5, record.getHAVE_CHECK_HUY_WITH_5());
+            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
             context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
             context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
             context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
@@ -208,6 +209,28 @@ public class SendUnicastDFController {
         }
     }
 
-    
+    @PostMapping("/step17")
+    public void checkSpam(){
+
+    }
+
+    @PostMapping("/step19")
+    public void checkChongLoiDung(){
+
+    }
+
+    @PostMapping("/step22")
+    public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
+//        return thuebaoSudungDichvu.checkThueBao(
+//                request.getLstSoap34(),
+//                request.getLstSoap8(),
+//                request.getScriptShopId(),
+//                request.getSharingKey(),
+//                request.getMsisdn(),
+//                request.getPackageCode(),
+//                request.getChannel()
+//        );
+        return false;
+    }
 
 }

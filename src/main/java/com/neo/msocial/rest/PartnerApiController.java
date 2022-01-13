@@ -3,7 +3,7 @@ package com.neo.msocial.rest;
 import com.neo.msocial.dto.*;
 import com.neo.msocial.groovy.ChongLoiDung;
 import com.neo.msocial.groovy.Spam;
-import com.neo.msocial.groovy.ThuebaoHuyDichVu;
+import com.neo.msocial.groovy.ThueBaoHuyDichVu;
 import com.neo.msocial.groovy.ThuebaoSudungDichvu;
 import com.neo.msocial.request.RequestStep20;
 import com.neo.msocial.request.RequestStep22;
@@ -25,7 +25,7 @@ public class PartnerApiController {
     private final UtilServices utilServices;
     private final Spam spam;
     private final ChongLoiDung chongLoiDung;
-    private final ThuebaoHuyDichVu thuebaoHuyDichVu;
+    private final ThueBaoHuyDichVu thuebaoHuyDichVu;
     private final ThuebaoSudungDichvu thuebaoSudungDichvu;
     private final GenericsRequest<Soap31> request31;
     private final GenericsRequest<Soap15> request15;
@@ -39,7 +39,7 @@ public class PartnerApiController {
     private final GenericsRequest<Soap17> request17;
     private final GenericsRequest<Soap19> request19;
 
-    public PartnerApiController(RedisUtils context, UtilServices utilServices, Spam spam, ChongLoiDung chongLoiDung, ThuebaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap31> request31, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap24> request24, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
+    public PartnerApiController(RedisUtils context, UtilServices utilServices, Spam spam, ChongLoiDung chongLoiDung, ThueBaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap31> request31, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap24> request24, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
         this.context = context;
         this.utilServices = utilServices;
         this.spam = spam;
@@ -194,7 +194,7 @@ public class PartnerApiController {
             context.put(Soap9.haveChangePackage, record.getHAVE_CHANGE_PACKAGE());
 
             context.put(Soap9.haveCheckHuy, record.getHAVE_CHECK_HUY());
-            context.put(Soap9.haveCheckHuyWith5, record.getHAVE_CHECK_HUY_WITH_5());
+            context.put(Soap9.haveCheckHuyWith5000, record.getHAVE_CHECK_HUY_WITH_5000());
             context.put(Soap9.haveMaintain, record.getHAVE_MAINTAIN());
             context.put(Soap9.likeMiOrVas, record.getLIKE_MI_OR_VAS());
             context.put(Soap9.needCheckService, record.getNEED_CHECK_SERVICE());
@@ -282,9 +282,9 @@ public class PartnerApiController {
         );
     }
 
-    @PostMapping("/step25")
-    public boolean step25() {
-        return thuebaoHuyDichVu.checkThueBaoHuy();
-    }
+//    @PostMapping("/step25")
+//    public boolean step25() {
+//        return thuebaoHuyDichVu.checkThueBaoHuy();
+//    }
 
 }

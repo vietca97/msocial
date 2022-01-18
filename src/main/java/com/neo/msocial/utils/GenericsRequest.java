@@ -41,7 +41,38 @@ public class GenericsRequest<T> {
             String resultReplace = result.replace("\\", "");
             Type typeOfObjectsList = new TypeToken<ArrayList<T>>() {
             }.getType();
-            List<T> objectsList = gson.fromJson(resultReplace, typeOfObjectsList);
+            String s = "\"{MA_BAI_HAT}\"";
+            String formartResultReplace = resultReplace
+                    .replaceAll("\"\\{SONG_NAME}\"", "{SONG_NAME}")
+                    .replaceAll("\"\\{MA_BAI_HAT}\"", "{MA_BAI_HAT}")
+                    ;
+
+            List<T> objectsList = gson.fromJson(formartResultReplace, typeOfObjectsList);
+            return objectsList;
+        } catch (StringIndexOutOfBoundsException | HttpServerErrorException e) {
+            return null;
+        }
+    }
+
+    //http://10.252.12.237:4122/services/SqlServices/query?Service=system_parameter&Provider=default&ParamSize=0
+    public List<T> getDataConfigUraTion(Map<String, String> params) {
+        try {
+            String response = "";
+            String result = "";
+            response = restTemplate.getForObject(getRequestUrl(params), String.class);
+            result = response.substring(response.indexOf("["), response.indexOf("]") + 1);
+
+
+            String resultReplace = result.replace("\\", "");
+            Type typeOfObjectsList = new TypeToken<ArrayList<T>>() {
+            }.getType();
+            String s = "\"{MA_BAI_HAT}\"";
+            String formartResultReplace = resultReplace
+                    .replaceAll("\"\\{SONG_NAME}\"", "{SONG_NAME}")
+                    .replaceAll("\"\\{MA_BAI_HAT}\"", "{MA_BAI_HAT}")
+                    ;
+
+            List<T> objectsList = gson.fromJson(formartResultReplace, typeOfObjectsList);
             return objectsList;
         } catch (StringIndexOutOfBoundsException | HttpServerErrorException e) {
             return null;
@@ -53,7 +84,7 @@ public class GenericsRequest<T> {
         urlResponse.append(BASE_URL);
         urlResponse.append(params.containsKey("typeQuery") ? params.get("typeQuery") : null).append("/") // typeQuery
                 .append("?Service=").append(params.containsKey("Service") ? params.get("Service") : null) // service
-                    .append("&Provider=").append(params.containsKey("Provider") ? params.get("Provider") : null) // provider
+                .append("&Provider=").append(params.containsKey("Provider") ? params.get("Provider") : null) // provider
                 .append("&ParamSize=").append(params.containsKey("ParamSize") ? params.get("ParamSize") : null) // paramSize
                 .append("&response=").append(params.containsKey("response") ? params.get("response") : null); // Content type
         for (int i = 0; i < params.size(); i++) {

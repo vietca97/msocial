@@ -310,6 +310,11 @@ public class RegisterServicePartnerController {
                 request.getServiceid());
     }
 
+    @GetMapping("/step23")
+    public boolean resultCheckChongLoiDung(@RequestBody RequestStep22 request){
+        return checkChongLoiDung(request);
+    }
+
     @PostMapping("/step25")
     public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
         // true => NEXT
@@ -334,7 +339,7 @@ public class RegisterServicePartnerController {
     // step27 -> end
 
     @PostMapping("/step28")
-    public boolean step28(@RequestBody RequestStep28 request) {
+    public boolean checkThueBaoHuyDichVu(@RequestBody RequestStep28 request) {
         // false => NEXT
         return thuebaoHuyDichVu.checkThueBaoHuy(
                 request.getLstSoap34(),
@@ -348,7 +353,7 @@ public class RegisterServicePartnerController {
     }
 
     @PostMapping("/step29")
-    public boolean step29(@RequestBody RequestStep29 request) {
+    public boolean resultCheckHuy(@RequestBody RequestStep29 request) {
         // ket qua cua step 28
         System.out.println("----:"+ request.isCheckHuyStatus());
         System.out.println("----:SERVICE"+ context.get("SERVICE_KEY"));
@@ -388,7 +393,7 @@ public class RegisterServicePartnerController {
     @PostMapping("/step34")
     public String registerService() {
         // Chua co file gateway_32.txt
-        return "gateway_32.txt";
+        return "true";
 
     }
     // step35 -> end

@@ -264,7 +264,30 @@ public class UtilServices {
         }
         return ret;
     }
+    public String getValueFromKeyServicePackageDetail(List<ServicePackageDetailDto> lst, String key, String value) {
+        String ret = "";
+        for (ServicePackageDetailDto record : lst) {
+            switch (value) {
+                case "PACKAGE_PRICE":
+                    if(record.getPACKAGE_CODE() != null && record.getPACKAGE_CODE().equals(key)){
+                        ret = record.getPACKAGE_PRICE();
+                        break;
+                    }
+                case "CAPACITY":
+                    if(record.getPACKAGE_CODE() != null && record.getPACKAGE_CODE().equals(key)){
+                        ret = record.getCAPACITY();
+                        break;
+                    }
+                case "PACKAGE_CYCLE":
+                    if(record.getPACKAGE_CODE() != null && record.getPACKAGE_CODE().equals(key)){
+                        ret = record.getPACKAGE_CYCLE();
+                        break;
+                    }
+            }
 
+        }
+        return ret;
+    }
     public String callSoapValidateRequest(ValidateRequest dto) {
         StringBuilder str_soap = new StringBuilder();
         str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");

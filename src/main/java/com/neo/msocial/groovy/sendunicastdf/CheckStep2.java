@@ -1,101 +1,79 @@
-package com.neo.msocial.groovy.sendunicastdf
+package com.neo.msocial.groovy.sendunicastdf;
 
-import com.neo.msocial.dto.Soap2
-import com.neo.msocial.service.Activation
-import com.neo.msocial.utils.RedisUtils
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import com.neo.msocial.dto.Soap2;
+import com.neo.msocial.service.Activation;
+import com.neo.msocial.utils.RedisUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
-class CheckStep2 {
+public class CheckStep2 {
+
     @Autowired
     private RedisUtils context;
 
     @Autowired
     private Activation activation;
-    def sendSms = { String receiver, String messageSms ->
+
+    String sendSms(String receiver, String messageSms) {
         try {
-            //receiver = String.valueOf(receiver);
-            String serviceNumber = "909";
-            String smsHost = "";
-            String smsPort = "0";
-            String smsLookup = "";
+            String serviceNumber = context.get("SERVICE_NUMBER");
+            String smsHost = context.get("SMS_HOST");
+            String smsPort = context.get("SMS_PORT");
+            String smsLookup = context.get("SMS_LOOKUP");
             String utilUrl = context.get("dataflow_param:utilmodule");
-            String request = """
-		<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-		   <soapenv:Header/>
-		   <soapenv:Body>
-		      <vms:sendSms>
-		         <!--Optional:-->
-		         <vms:args0>$serviceNumber</vms:args0>
-		         <!--Optional:-->
-		         <vms:args1>$receiver</vms:args1>
-		         <!--Optional:-->
-		         <vms:args2>$messageSms</vms:args2>
-		         <!--Optional:-->
-		         <vms:args3>$smsHost</vms:args3>
-		         <!--Optional:-->
-		         <vms:args4>$smsPort</vms:args4>
-		         <!--Optional:-->
-		         <vms:args5>$smsLookup</vms:args5>
-		      </vms:sendSms>
-		   </soapenv:Body>
-		</soapenv:Envelope>
-		""";
-            String result = activation.soapCall(utilUrl, request);
+
+            StringBuilder str_soap = new StringBuilder();
+            str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+            str_soap.append("<soapenv:Header/><soapenv:Body>");
+            str_soap.append("<vms:sendSms>");
+            str_soap.append("<vms:args0>").append(serviceNumber).append("</vms:args0>");
+            str_soap.append("<vms:args1>").append(receiver).append("</vms:args1>");
+            str_soap.append("<vms:args2>").append(messageSms).append("</vms:args2>");
+            str_soap.append("<vms:args3>").append(smsHost).append("</vms:args3>");
+            str_soap.append("<vms:args4>").append(smsPort).append("</vms:args4>");
+            str_soap.append("<vms:args5>").append(smsLookup).append("</vms:args5>");
+            str_soap.append("</vms:sendSms></soapenv:Body></soapenv:Envelope>");
+            String result = activation.soapCall(utilUrl, str_soap.toString());
             return result;
         } catch (Exception e) {
             return "-1|" + e.getMessage();
         }
     }
-    def getValueFromKey = { String body, String key ->
-        String ret = "";
-        try {
-            def rootNode = new XmlSlurper().parseText(body);
-            for (def record : rootNode.record.children()) {
-                if (record.name().equals(key)) {
-                    ret = record.text();
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            //ex.printStackTrace();
-            ret = "";
-        }
-        return ret;
-    }
 
-//Ngay 31/08/2018: Bo sung check cac goi FTPPlay:
-    def getInt = { String value ->
+    //Ngay 31/08/2018: Bo sung check cac goi FTPPlay:
+    int getInt(String value) {
         try {
             //Ham convert Integer:
             return Integer.parseInt(value);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             return 0;
         }
+
     }
-    def getProfile = { String channel, String msisdn ->
+
+    String getProfile(String channel, String msisdn) {
         try {
             String utilUrl = context.get("dataflow_param:utilmodule");
-            String request = """
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:vms="http://vms.neo">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <vms:getProFileInfo>
-         <vms:args0>$channel</vms:args0>
-         <vms:args1>$msisdn</vms:args1>
-      </vms:getProFileInfo>
-   </soapenv:Body>
-</soapenv:Envelope>
-""";
-            String result = activation.parseXMLtext(activation.soapCall(context.get("dataflow_param:utilmodule"), request), "//*[local-name() = 'return']");
+
+            StringBuilder str_soap = new StringBuilder();
+            str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
+            str_soap.append("<soapenv:Header/><soapenv:Body>");
+            str_soap.append("<vms:getProFileInfo>");
+            str_soap.append("<vms:args0>").append(channel).append("</vms:args0>");
+            str_soap.append("<vms:args1>").append(msisdn).append("</vms:args1>");
+            str_soap.append("</vms:getProFileInfo></soapenv:Body></soapenv:Envelope>");
+            String result = activation.parseXMLtext(activation.soapCall(utilUrl, str_soap.toString()), "//*[local-name() = 'return']");
             return result;
         } catch (Exception e) {
             return "ERR|" + e.getMessage();
         }
     }
 
-    boolean check() {
+    boolean check(String packagecode, String channel, String msisdn, String sharingkey) {
         String pkg = packagecode;
         if (pkg.equals("TT30") || pkg.equals("TH30") || pkg.equals("TT90") || pkg.equals("TH90")) {
             String resPro = getProfile(channel, msisdn);
@@ -148,13 +126,15 @@ class CheckStep2 {
                 }
             }
             if (!is_pass) {
-                context.put("ErrorCodeAPI", "100"); context.put("ErrorDescAPI", "FTPPLAY_KHONG_DU_KICH_HOAT");
+                context.put("ErrorCodeAPI", "100");
+                context.put("ErrorDescAPI", "FTPPLAY_KHONG_DU_KICH_HOAT");
                 return is_pass;
             }
-        }//End check goi ftpplay.
+        }
+        return true;//End check goi ftpplay.
     }
 
-    boolean getRetVal(List<Soap2> $soap_2_extract1) {
+    public boolean getRetVal(List<Soap2> $soap_2_extract1) {
         boolean retval = false;
         try {
             System.out.println($soap_2_extract1);
@@ -162,7 +142,7 @@ class CheckStep2 {
             //def rootNode = new XmlSlurper().parseText($soap_2_extract1);
             String errorCode = $soap_2_extract1.get(0).getErrorCode();
             if (!errorCode.equals("0")) {
-                String errorDesc = $soap_2_extract1.get(0).getErrorDesc()
+                String errorDesc = $soap_2_extract1.get(0).getErrorDesc();
                 context.put("ErrorCodeAPI", errorCode);
                 context.put("ErrorDescAPI", errorDesc);
             } else {
@@ -174,14 +154,13 @@ class CheckStep2 {
                     context.put("ErrorCodeAPI", "55");
                     context.put("ErrorDescAPI", "Thoi gian kich ban khong phu hop");
                 } else {
-                    for(Soap2 record : $soap_2_extract1){
+                    for (Soap2 record : $soap_2_extract1) {
                         //context.put(it.name(), it.text());
                     }
                     retval = true;
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         } finally {
             if (!retval) {
@@ -223,3 +202,5 @@ class CheckStep2 {
     }
 
 }
+
+

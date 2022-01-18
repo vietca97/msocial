@@ -1,10 +1,12 @@
 package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
-import com.neo.msocial.groovy.sendunicastdf.CheckStep2;
-import com.neo.msocial.request.RequestStep25;
-import com.neo.msocial.request.ValidateRequest;
+import com.neo.msocial.groovy.ThueBaoHuyDichVu;
+import com.neo.msocial.groovy.sendunicastdf.*;
+import com.neo.msocial.request.*;
 import com.neo.msocial.request.partnerapi.RequestStep16;
+import com.neo.msocial.request.sendunicastdf.RequestChongLoiDung;
+import com.neo.msocial.request.sendunicastdf.RequestProcessBusiness;
 import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.UtilServices;
@@ -29,9 +31,15 @@ public class SendUnicastDFController {
     private final GenericsRequest<Soap17> request17;
     private final GenericsRequest<Soap19> request19;
     private final GenericsRequest<Soap24> request24;
-    private final GenericsRequest<Soap31> request31;
+    private final GenericsRequest<Soap34> request34;
+    private final CheckSpam checkSpam;
+    private final CheckChongLoiDung checkChongLoiDung;
+    private final CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu;
+    private final ThueBaoHuyDichVu thuebaoHuyDichVu;
+    private final CheckMiFc checkMiFc;
+    private final ProcessBusiness processBusiness;
 
-    public SendUnicastDFController(UtilServices utilServices, RedisUtils context, CheckStep2 checkStep2, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19, GenericsRequest<Soap24> request24, GenericsRequest<Soap31> request31) {
+    public SendUnicastDFController(UtilServices utilServices, RedisUtils context, CheckStep2 checkStep2, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19, GenericsRequest<Soap24> request24, GenericsRequest<Soap34> request34, CheckSpam checkSpam, CheckChongLoiDung checkChongLoiDung, CheckThueBaoSuDungDichVu checkThueBaoSuDungDichVu, ThueBaoHuyDichVu thuebaoHuyDichVu, CheckMiFc checkMiFc, ProcessBusiness processBusiness) {
         this.utilServices = utilServices;
         this.context = context;
         this.checkStep2 = checkStep2;
@@ -45,7 +53,13 @@ public class SendUnicastDFController {
         this.request17 = request17;
         this.request19 = request19;
         this.request24 = request24;
-        this.request31 = request31;
+        this.request34 = request34;
+        this.checkSpam = checkSpam;
+        this.checkChongLoiDung = checkChongLoiDung;
+        this.checkThueBaoSuDungDichVu = checkThueBaoSuDungDichVu;
+        this.thuebaoHuyDichVu = thuebaoHuyDichVu;
+        this.checkMiFc = checkMiFc;
+        this.processBusiness = processBusiness;
     }
 
     @PostMapping("/step1")
@@ -114,12 +128,12 @@ public class SendUnicastDFController {
     }
 
     @GetMapping("/step14")
-    public List<Soap31> getMtScriptShop(@RequestParam Map<String, String> params){
-        return request31.getData(params);
+    public List<Soap34> getMtScriptShop(@RequestParam Map<String, String> params){
+        return request34.getData(params);
     }
 
     @PostMapping("/step15")
-    public void putData(@RequestBody RequestStep16 request) {
+    public String putData(@RequestBody RequestStep16 request) {
         for (Soap24 record : request.getLstSoap24()) {
             context.put(Soap24.jobExpDataDirExpLocal, record.getJOB_EXP_DATA_DIR_EXP_LOCAL());
             context.put(Soap24.jobExpDataDirFtp, record.getJOB_EXP_DATA_DIR_FTP());
@@ -194,43 +208,125 @@ public class SendUnicastDFController {
             context.put(Soap28.soNgayCheckhuy, record.getSO_NGAY_CHECKHUY());
             context.put(Soap28.startTime, record.getSTART_TIME());
         }
+        return "Put redis successful step 15 !!!";
     }
 
     @PostMapping("/step16")
-    public void step16(@RequestBody List<Soap31> soap31List){
+    public String step16(@RequestBody List<Soap34> soap34List){
         try{
-            for(Soap31 record : soap31List){
-                context.put(Soap31.checkAccountApi,record.getCHECK_ACCOUNT_API());
+            for(Soap34 record : soap34List){
+                context.put(Soap34.mtTypeKey, record.getMT_TYPE_KEY());
+                context.put(Soap34.mtTypeValue, record.getMT_TYPE_VALUE());
             }
 
         }catch(Exception ex){
             System.out.println(ex.getMessage());
             context.set("SCRIPT_MT_EMPTY","true");
         }
+        return "Put redis successful step 16 !!!";
     }
 
     @PostMapping("/step17")
-    public void checkSpam(){
-
+    public boolean checkSpam(RequestStep20 request){
+        return checkSpam.checkSendSms(
+                request.getLstSoap8(),
+                request.getLstSoap12(),
+                request.getLstSoap14(),
+                request.getLstSoap15(),
+                request.getLstSoap16(),
+                request.getLstSoap17(),
+                request.getLstSoap19(),
+                request.getLstSoap34(),
+                request.getChannel(), request.getSharingKeyId(), request.getMsisdn(), "");
     }
 
     @PostMapping("/step19")
-    public void checkChongLoiDung(){
-
+    public boolean checkChongLoiDung(RequestChongLoiDung request){
+        return checkChongLoiDung.bussiness(request.getLstSoap8(),
+                request.getLstSoap12(),
+                request.getLstSoap34(),
+                request.getScript_shop_id(),
+                request.getMsisdn(),
+                request.getServiceid(),
+                request.getSharingkey());
     }
 
     @PostMapping("/step22")
     public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
-//        return thuebaoSudungDichvu.checkThueBao(
-//                request.getLstSoap34(),
-//                request.getLstSoap8(),
-//                request.getScriptShopId(),
-//                request.getSharingKey(),
-//                request.getMsisdn(),
-//                request.getPackageCode(),
-//                request.getChannel()
-//        );
-        return false;
+        return checkThueBaoSuDungDichVu.checkThueBao(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getSharingKey(),
+                request.getMsisdn(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
+    }
+
+    @PostMapping("/step23")
+    public boolean resultThuebaoUseService(@RequestBody RequestStep26 request) {
+        // ket qua cua step 22
+        System.out.println("checkUsedService:"+request.isCheckUsedService());
+        return request.isCheckUsedService();
+    }
+
+    @PostMapping("/step25")
+    public boolean checkThueBaoHuy(@RequestBody RequestStep28 request) {
+        // false => NEXT
+        return thuebaoHuyDichVu.checkThueBaoHuy(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
+    }
+
+    @PostMapping("/step26")
+    public boolean step26(@RequestBody RequestStep29 request) {
+        // ket qua cua step 25
+        System.out.println("FALSE::::"+ request.isCheckHuyStatus());
+        if("MOBILEINTERNET".equals(context.get("SERVICE_KEY")) || "FASTCONNECT".equals(context.get("SERVICE_KEY")) ) return true;
+        else
+        {
+            return request.isCheckHuyStatus();
+        }
+    }
+
+    @PostMapping("/step28")
+    public boolean checkMiFc(@RequestBody RequestStep31 request) {
+        // true => NEXT
+        return checkMiFc.checkMifc(
+                request.getLstSoap8(),
+                request.getLstSoap34(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getServiceId(),
+                request.getPackageCode(),
+                request.getChannel(),
+                request.getScriptShopId(),
+                request.getCheckStartDate()
+        );
+    }
+
+    @PostMapping("/step29")
+    public boolean processBusiness(@RequestBody RequestProcessBusiness request) {
+        // true => NEXT
+        return processBusiness.business(
+                request.getLstSoap8(),
+                request.getLstSoap34(),
+                request.getMsisdn(),
+                request.getChannel(),
+                request.getScript_shop_id(),
+                request.getMaChiNhanh(),
+                request.getSharing_key_id(),
+                request.getChannelId(),
+                request.getPartnerId(),
+                request.getAgentId()
+        );
     }
 
 }

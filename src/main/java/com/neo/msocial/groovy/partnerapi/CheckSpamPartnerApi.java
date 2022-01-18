@@ -1,4 +1,4 @@
-package com.neo.msocial.groovy.sendunicastdf;
+package com.neo.msocial.groovy.partnerapi;
 
 import com.neo.msocial.dto.*;
 import com.neo.msocial.service.Activation;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CheckSpam {
+public class CheckSpamPartnerApi {
     @Autowired
     private Activation activation;
     @Autowired
@@ -30,6 +30,7 @@ public class CheckSpam {
     private GenericsRequest<SmsPerDayDTO> smsPerDayDTOGenericsRequest;
     @Autowired
     private ParseXml parseXml;
+
     public String logSql(String msisdn, String transactionId, String stepName, String stepIndex, String stepKey, String stepInput, String stepOutput, String stepAction, String startTime, String endTime, String inputParameter, String scriptShopId) {
         StringBuilder str_soap = new StringBuilder();
         str_soap.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:vms=\"http://vms.neo\">");
@@ -84,7 +85,7 @@ public class CheckSpam {
 
     }
 
-    public boolean checkSendSms(List<Soap8> $soap_8_extract1, List<Soap12> $soap_12_extract1, List<Soap14> $soap_14_extract1, List<Soap15> $soap_15_extract1, List<Soap16> $soap_16_extract1, List<Soap17> $soap_17_extract1, List<Soap19> $soap_19_extract1, List<Soap34> $soap_34_extract1, String channel, String sharing_key_id, String msisdn, String script_shop_id) {
+    public boolean checkSendSms(List<Soap8> $soap_8_extract1, List<Soap12> $soap_12_extract1, List<Soap14> $soap_14_extract1, List<Soap15> $soap_15_extract1, List<Soap16> $soap_16_extract1, List<Soap17> $soap_17_extract1, List<Soap19> $soap_19_extract1, String channel, String sharing_key_id, String msisdn, String script_shop_id) {
         System.out.println($soap_16_extract1);
         System.out.println($soap_15_extract1);
         System.out.println($soap_14_extract1);
@@ -108,10 +109,8 @@ public class CheckSpam {
             System.out.println($soap_17_extract1.get(0).getWAITPERSERVICETOTAL() + "|sharingkey:" + context.get("sharingkey"));
             if (Integer.parseInt($soap_17_extract1.get(0).getWAITPERSERVICETOTAL()) >= 1) {
                 if (sendSmsForSharing) {
-                    //String mt = getValueFromKeyMultiRecords($soap_31_extract1,"record","MT_TYPE_KEY","MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE","MT_TYPE_VALUE").replaceAll("\\{MSISDN}",String.valueOf($msisdn)).replaceAll("\\{SERVICE_KEY}",context.get("SERVICE_KEY"));
-                    String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
-                    if (mt == null || mt.equals(""))
-                        mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                    String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "MT_NOTICE_SHARING_PARTNER_WAIT_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+
                     String ret = sendSms(context.get("sharingkey"), mt);
                     System.out.println("ret:" + ret);
                 }
@@ -125,9 +124,7 @@ public class CheckSpam {
             System.out.println($soap_19_extract1.get(0).getREFUSEDPERSERVICETOTAL() + "|sharingkey:" + context.get("sharingkey"));
             if (Integer.parseInt($soap_19_extract1.get(0).getREFUSEDPERSERVICETOTAL()) >= 1) {
                 if (sendSmsForSharing) {
-                    String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
-                    if (mt == null || mt.equals(""))
-                        mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                    String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "MT_NOTICE_SHARING_PARTNER_REFUSED_PER_SERVICE").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
                     String ret = sendSms(context.get("sharingkey"), mt);
                     System.out.println("ret:" + ret);
                 }
@@ -139,13 +136,13 @@ public class CheckSpam {
 
 
             try {
-                maxRefusedPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1,"TRANS_REFUSED_PER_DAY","SPAM_TEMPLATE_VALUE"));
+                maxRefusedPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1, "TRANS_REFUSED_PER_DAY", "SPAM_TEMPLATE_VALUE"));
             } catch (Exception e) {
             }
 
             int maxFaildPerDay = 0;
             try {
-                maxFaildPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1, "TRANS_FAILED_PER_DAY","SPAM_TEMPLATE_VALUE"));
+                maxFaildPerDay = Integer.parseInt(utilServices.getValueFromKeySOAP15($soap_15_extract1, "TRANS_FAILED_PER_DAY", "SPAM_TEMPLATE_VALUE"));
             } catch (Exception e) {
                 maxFaildPerDay = 1000000;
             }
@@ -161,18 +158,13 @@ public class CheckSpam {
                     if (ret.equals("1")) {
                         if (sendSmsForSharing) {
                             if (no >= maxRefusedPerDay) {
-                                String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "REFUSED_GIOITHIEU").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", String.valueOf(no)));
-                                if (mt == null || mt.equals("")){
-                                    mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "REFUSED_GIOITHIEU").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", String.valueOf(no)));
-                                    ret = sendSms(context.get("sharingkey"), mt);
-                                }
-
-                            } else if (noConfirm >= maxFaildPerDay || (no + noConfirm) >= maxFaildPerDay) {
-                                String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1, "LOCK_DIEM_BAN").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
-                                if (mt == null || mt.equals(""))
-                                    mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "LOCK_DIEM_BAN").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
-
+                                String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "REFUSED_GIOITHIEU").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY").replaceAll("\\{REFUSED_TOTAL}", String.valueOf(no)));
                                 ret = sendSms(context.get("sharingkey"), mt);
+                            } else if (noConfirm >= maxFaildPerDay || (no + noConfirm) >= maxFaildPerDay) {
+                                String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "LOCK_DIEM_BAN").replaceAll("\\{MSISDN}", String.valueOf(msisdn)).replaceAll("\\{SERVICE_KEY}", context.get("SERVICE_KEY"));
+                                ret = sendSms(context.get("sharingkey"), mt);
+
+
                             }
 
                         }
@@ -188,9 +180,8 @@ public class CheckSpam {
                 if ((no + noConfirm) == (maxFaildPerDay - 1) || (no + noConfirm) == (maxRefusedPerDay - 1)) {
                     if (sendSmsForSharing) {
                         if ((no + noConfirm) == (maxFaildPerDay - 1)) {
-                            String mt = utilServices.getValueFromKeySOAP34($soap_34_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
-                            if (mt == null || mt.equals(""))
-                                mt = utilServices.getValueFromKeySOAP8($soap_8_extract1,"TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
+                            String mt = utilServices.getValueFromKeySOAP8($soap_8_extract1, "TRANSACTION_FAILED").replaceAll("\\{TRANSACTION_FAILED}", String.valueOf(no + noConfirm));
+
                             String ret = sendSms(context.get("sharingkey"), mt);
                             System.out.println("ret:" + ret);
                         } else {
@@ -244,23 +235,20 @@ public class CheckSpam {
             }
 
 
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             ex.printStackTrace();
             stepResult = false;
             return false;
         } finally {
             /*def logSql = {String msisdn, String transactionId, String stepName, int stepID,String stepKey,
 	        String stepInput,String stepOutput,String stepAction,String startTime, String endTime,String inputParameter ->*/
-            logSql(msisdn,"-1","CHECK_SPAM_POLICY","1","CHECK_SPAM_POLICY","script_shop_id=$script_shop_id|no="+no+",noConfirm="+noConfirm,String.valueOf(stepResult),context.get("ErrorCodeAPI")+"|"+context.get("ErrorDescAPI"),startTime,new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()),"sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel",script_shop_id);
-            System.out.println("stepResult:"+stepResult);
+            logSql(msisdn, "-1", "CHECK_SPAM_POLICY", "1", "CHECK_SPAM_POLICY", "script_shop_id=$script_shop_id|no=" + no + ",noConfirm=" + noConfirm, String.valueOf(stepResult), context.get("ErrorCodeAPI") + "|" + context.get("ErrorDescAPI"), startTime, new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()), "sharingkey=$sharingkey,serviceid=$serviceid,packagecode=$packagecode,channel=$channel", script_shop_id);
+            System.out.println("stepResult:" + stepResult);
             return stepResult;
         }
 
     }
-
-
-
-
 
 
 }

@@ -1,15 +1,17 @@
 package com.neo.msocial.rest;
 
 import com.neo.msocial.dto.*;
-import com.neo.msocial.groovy.ChongLoiDung;
-import com.neo.msocial.groovy.Spam;
 import com.neo.msocial.groovy.ThueBaoHuyDichVu;
-import com.neo.msocial.groovy.ThuebaoSudungDichvu;
-import com.neo.msocial.request.RequestStep20;
-import com.neo.msocial.request.RequestStep22;
-import com.neo.msocial.request.RequestStep25;
-import com.neo.msocial.request.ValidateRequest;
+import com.neo.msocial.groovy.partnerapi.CheckSpamPartnerApi;
+import com.neo.msocial.groovy.partnerapi.CheckThueBaoSuDungDichVuPartnerApi;
+import com.neo.msocial.groovy.sendunicastdf.CheckChongLoiDung;
+import com.neo.msocial.groovy.sendunicastdf.CheckMiFc;
+import com.neo.msocial.groovy.sendunicastdf.ProcessBusiness;
+import com.neo.msocial.request.*;
+import com.neo.msocial.request.partnerapi.RequestSpam;
 import com.neo.msocial.request.partnerapi.RequestStep16;
+import com.neo.msocial.request.sendunicastdf.RequestChongLoiDung;
+import com.neo.msocial.request.sendunicastdf.RequestProcessBusiness;
 import com.neo.msocial.utils.GenericsRequest;
 import com.neo.msocial.utils.RedisUtils;
 import com.neo.msocial.utils.UtilServices;
@@ -23,10 +25,11 @@ import java.util.Map;
 public class PartnerApiController {
     private final RedisUtils context;
     private final UtilServices utilServices;
-    private final Spam spam;
-    private final ChongLoiDung chongLoiDung;
+    private final CheckSpamPartnerApi spam;
+    private final CheckChongLoiDung checkChongLoiDung;
+    private final CheckThueBaoSuDungDichVuPartnerApi checkThueBaoSuDungDichVuPartnerApi;
     private final ThueBaoHuyDichVu thuebaoHuyDichVu;
-    private final ThuebaoSudungDichvu thuebaoSudungDichvu;
+    private final CheckMiFc checkMiFc;
     private final GenericsRequest<Soap31> request31;
     private final GenericsRequest<Soap15> request15;
     private final GenericsRequest<Soap8> request8;
@@ -38,14 +41,16 @@ public class PartnerApiController {
     private final GenericsRequest<Soap16> request16;
     private final GenericsRequest<Soap17> request17;
     private final GenericsRequest<Soap19> request19;
+    private final ProcessBusiness processBusiness;
 
-    public PartnerApiController(RedisUtils context, UtilServices utilServices, Spam spam, ChongLoiDung chongLoiDung, ThueBaoHuyDichVu thuebaoHuyDichVu, ThuebaoSudungDichvu thuebaoSudungDichvu, GenericsRequest<Soap31> request31, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap24> request24, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19) {
+    public PartnerApiController(RedisUtils context, UtilServices utilServices, CheckSpamPartnerApi spam, CheckChongLoiDung checkChongLoiDung, CheckThueBaoSuDungDichVuPartnerApi checkThueBaoSuDungDichVuPartnerApi, ThueBaoHuyDichVu thuebaoHuyDichVu, CheckMiFc checkMiFc, GenericsRequest<Soap31> request31, GenericsRequest<Soap15> request15, GenericsRequest<Soap8> request8, GenericsRequest<Soap24> request24, GenericsRequest<Soap9> request9, GenericsRequest<Soap12> request12, GenericsRequest<Soap14> request14, GenericsRequest<Soap28> request28, GenericsRequest<Soap16> request16, GenericsRequest<Soap17> request17, GenericsRequest<Soap19> request19, ProcessBusiness processBusiness) {
         this.context = context;
         this.utilServices = utilServices;
         this.spam = spam;
-        this.chongLoiDung = chongLoiDung;
+        this.checkChongLoiDung = checkChongLoiDung;
+        this.checkThueBaoSuDungDichVuPartnerApi = checkThueBaoSuDungDichVuPartnerApi;
         this.thuebaoHuyDichVu = thuebaoHuyDichVu;
-        this.thuebaoSudungDichvu = thuebaoSudungDichvu;
+        this.checkMiFc = checkMiFc;
         this.request31 = request31;
         this.request15 = request15;
         this.request8 = request8;
@@ -57,6 +62,7 @@ public class PartnerApiController {
         this.request16 = request16;
         this.request17 = request17;
         this.request19 = request19;
+        this.processBusiness = processBusiness;
     }
 
     @GetMapping("/step1")
@@ -246,8 +252,8 @@ public class PartnerApiController {
     }
 
     @PostMapping("/step17")
-    public boolean checkSpam(@RequestBody RequestStep20 request) {
-        return spam.checksendSms(
+    public boolean checkSpam(@RequestBody RequestSpam request) {
+        return spam.checkSendSms(
                 request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap14(),
@@ -255,24 +261,23 @@ public class PartnerApiController {
                 request.getLstSoap16(),
                 request.getLstSoap17(),
                 request.getLstSoap19(),
-                request.getLstSoap34(),
-                request.getChannel(), request.getSharingKeyId(), request.getMsisdn());
+                request.getChannel(), request.getSharingKeyId(), request.getMsisdn(), "");
     }
 
     @PostMapping("/step19")
-    public boolean checkChongLoiDung(@RequestBody RequestStep22 request) {
-        return chongLoiDung.bussiness(request.getLstSoap8(),
+    public boolean checkChongLoiDung(RequestChongLoiDung request){
+        return checkChongLoiDung.bussiness(request.getLstSoap8(),
                 request.getLstSoap12(),
                 request.getLstSoap34(),
                 request.getScript_shop_id(),
                 request.getMsisdn(),
-                request.getServiceid());
+                request.getServiceid(),
+                request.getSharingkey());
     }
 
     @PostMapping("/step22")
     public boolean checkThuebaoSudungDichvu(@RequestBody RequestStep25 request) {
-        return thuebaoSudungDichvu.checkThueBao(
-                request.getLstSoap34(),
+        return checkThueBaoSuDungDichVuPartnerApi.checkThueBao(
                 request.getLstSoap8(),
                 request.getScriptShopId(),
                 request.getSharingKey(),
@@ -282,9 +287,62 @@ public class PartnerApiController {
         );
     }
 
-//    @PostMapping("/step25")
-//    public boolean step25() {
-//        return thuebaoHuyDichVu.checkThueBaoHuy();
-//    }
+    @PostMapping("/step25")
+    public boolean checkThueBaoHuy(@RequestBody RequestStep28 request) {
+        // false => NEXT
+        return thuebaoHuyDichVu.checkThueBaoHuy(
+                request.getLstSoap34(),
+                request.getLstSoap8(),
+                request.getScriptShopId(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getPackageCode(),
+                request.getChannel()
+        );
+    }
+
+    @PostMapping("/step26")
+    public boolean step26(@RequestBody RequestStep29 request) {
+        // ket qua cua step 25
+        System.out.println("FALSE::::"+ request.isCheckHuyStatus());
+        if("MOBILEINTERNET".equals(context.get("SERVICE_KEY")) || "FASTCONNECT".equals(context.get("SERVICE_KEY")) ) return true;
+        else
+        {
+            return request.isCheckHuyStatus();
+        }
+    }
+
+    @PostMapping("/step28")
+    public boolean checkMiFc(@RequestBody RequestStep31 request) {
+        // true => NEXT
+        return checkMiFc.checkMifc(
+                request.getLstSoap8(),
+                request.getLstSoap34(),
+                request.getMsisdn(),
+                request.getSharingKey(),
+                request.getServiceId(),
+                request.getPackageCode(),
+                request.getChannel(),
+                request.getScriptShopId(),
+                request.getCheckStartDate()
+        );
+    }
+
+    @PostMapping("/step29")
+    public boolean processBusiness(@RequestBody RequestProcessBusiness request) {
+        // true => NEXT
+        return processBusiness.business(
+                request.getLstSoap8(),
+                request.getLstSoap34(),
+                request.getMsisdn(),
+                request.getChannel(),
+                request.getScript_shop_id(),
+                request.getMaChiNhanh(),
+                request.getSharing_key_id(),
+                request.getChannelId(),
+                request.getPartnerId(),
+                request.getAgentId()
+        );
+    }
 
 }
